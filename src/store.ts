@@ -1,9 +1,11 @@
 import {configureStore} from '@reduxjs/toolkit';
 import uiReducer from './reducers/uiReducer.ts';
+import dateReducer from './reducers/dateReducer.ts';
 
 const store = configureStore({
     reducer: {
-        ui: uiReducer
+        ui: uiReducer,
+        date: dateReducer
     },
 });
 

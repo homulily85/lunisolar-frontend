@@ -3,7 +3,7 @@ import {createSlice} from '@reduxjs/toolkit';
 const uiSlice = createSlice({
     name: 'ui',
     initialState: {
-        showSidebar: true
+        showSidebar: true,
     },
     reducers: {
         setShowSidebar(state, action) {
