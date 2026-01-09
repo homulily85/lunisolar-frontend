@@ -33,10 +33,10 @@ const NavBar = () => {
     }, [dispatch, todayTs]);
 
     const btnBase =
-        'hover:bg-gray-200 active:bg-gray-300 rounded-full p-2 flex items-center justify-center';
+        'hover:bg-gray-200 active:bg-gray-300 dark:hover:bg-gray-700 dark:active:bg-gray-800 rounded-full p-2 flex items-center justify-center';
 
     return (
-        <div className="p-4 flex">
+        <div className="p-4 flex justify-between dark:bg-gray-800 dark:text-white">
             <div className="flex justify-center items-center gap-2">
                 <button aria-label="Previous month" className={btnBase}
                         onClick={() => changeMonth(-1)}>
@@ -51,10 +51,18 @@ const NavBar = () => {
 
                 <button
                     onClick={jumpToToday}
-                    className="hover:bg-gray-200 active:bg-gray-300 rounded-xl border py-2 px-8 border-gray-1000"
+                    className="hover:bg-gray-200 active:bg-gray-300 rounded-xl border py-2 px-8 border-gray-400
+                     dark:hover:bg-gray-700 dark:active:bg-gray-800"
                     aria-label="Jump to today"
                 >
                     Hôm nay
+                </button>
+            </div>
+            <div className="flex justify-center items-center gap-2">
+                <button
+                    className="hover:bg-gray-200 active:bg-gray-300
+                     dark:hover:bg-gray-700 dark:active:bg-gray-800
+                     rounded-lg py-2 px-2">
                 </button>
             </div>
         </div>

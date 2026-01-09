@@ -37,11 +37,14 @@ const Sidebar = () => {
     const lunarYearCanChi = selectedLunarDate?.yearCanChi ?? '';
 
     return (
-        <div className="h-screen grid grid-rows-[1fr_10fr] p-2 bg-gray-150">
+        <div
+            className="h-screen grid grid-rows-[1fr_10fr] p-2 bg-gray-150 dark:bg-gray-900 dark:text-white">
             <div>
                 <button
                     aria-label="Toggle sidebar"
-                    className="hover:bg-gray-200 active:bg-gray-300 rounded-md w-max h-max mt-3"
+                    className="hover:bg-gray-200 active:bg-gray-300
+                      dark:hover:bg-gray-700 dark:active:bg-gray-800
+                     rounded-md w-max h-max mt-3"
                     onClick={toggleSidebar}
                 >
                     <Icon path={mdiMenu} size={2}/>

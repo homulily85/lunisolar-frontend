@@ -61,10 +61,12 @@ const Calendar = () => {
 
     return (
         <div
-            className="bg-gray-200 grid grid-cols-7 grid-rows-[auto_repeat(6,1fr)] gap-2 p-4 h-full w-full overflow-auto">
+            className="bg-gray-200 grid grid-cols-7 grid-rows-[auto_repeat(6,1fr)] gap-2 p-4 h-full w-full overflow-auto
+            dark:bg-gray-800 dark:text-white">
             {WEEK_DAYS.map((d) => (
-                <div key={d} className="bg-white justify-items-center rounded-lg py-2 px-4">
-                    <p className="font-bold text-lg text-orange-700">{d}</p>
+                <div key={d}
+                     className="bg-white justify-items-center rounded-lg py-2 px-4 dark:bg-gray-700">
+                    <p className="font-bold text-lg ">{d}</p>
                 </div>
             ))}
 
