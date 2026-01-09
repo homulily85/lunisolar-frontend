@@ -1,4 +1,4 @@
-import {useCallback, useMemo} from 'react';
+import React, {useCallback, useMemo} from 'react';
 import {useAppDispatch, useAppSelector} from '../../hook.ts';
 import {LunarCalendar} from '@dqcai/vn-lunar';
 import {setCurrentSelectedSolarDate} from '../../reducers/dateReducer.ts';
@@ -58,10 +58,28 @@ const Calendar = () => {
         },
         [dispatch]
     );
+    
+    const changeMonth = useCallback(
+        (delta: number) => {
+            const d = new Date(selectedTs);
+            d.setMonth(d.getMonth() + delta);
+            dispatch(setCurrentSelectedSolarDate(d.getTime()));
+        },
+        [dispatch, selectedTs]
+    );
+
+    const onWheel = useCallback((e: React.WheelEvent<HTMLDivElement>) => {
+        if (e.deltaY > 0) {
+            changeMonth(1);
+        } else {
+            changeMonth(-1);
+        }
+    }, [changeMonth]);
+
 
     return (
-        <div
-            className="bg-gray-200 grid grid-cols-7 grid-rows-[auto_repeat(6,1fr)] gap-2 p-4 h-full w-full overflow-auto
+        <div onWheel={onWheel}
+             className="bg-gray-200 grid grid-cols-7 grid-rows-[auto_repeat(6,1fr)] gap-2 p-4 h-full w-full overflow-auto
             dark:bg-gray-800 dark:text-white">
             {WEEK_DAYS.map((d) => (
                 <div key={d}
