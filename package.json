@@ -11,11 +11,13 @@
     },
     "dependencies": {
         "@dqcai/vn-lunar": "^1.0.1",
+        "@headlessui/react": "^2.2.9",
         "@mdi/js": "^7.4.47",
         "@mdi/react": "^1.6.1",
         "@reduxjs/toolkit": "^2.11.2",
         "@tailwindcss/vite": "^4.1.18",
         "react": "^19.2.0",
+        "react-day-picker": "^9.13.0",
         "react-dom": "^19.2.0",
         "react-redux": "^9.2.0",
         "redux": "^5.0.1",

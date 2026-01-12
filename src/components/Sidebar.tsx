@@ -2,7 +2,7 @@ import {useCallback, useMemo} from 'react';
 import Icon from '@mdi/react';
 import {mdiMenu, mdiPlus} from '@mdi/js';
 import {useAppDispatch, useAppSelector} from '../hook';
-import {setShowSidebar} from '../reducers/uiReducer';
+import {setShowDialog, setShowSidebar} from '../reducers/uiReducer';
 import monthNames from '../utils/monthNames';
 import {LunarCalendar} from '@dqcai/vn-lunar';
 
@@ -62,9 +62,9 @@ const Sidebar = () => {
                     </p>
 
                     <div className="flex justify-center mt-4">
-                        <button
-                            aria-label="Add"
-                            className="px-4 py-2 rounded-md text-white bg-orange-600 hover:bg-orange-700 active:bg-orange-800 font-bold text-lg"
+                        <button onClick={() => dispatch(setShowDialog(true))}
+                                aria-label="Add"
+                                className="px-4 py-2 rounded-md text-white bg-orange-600 hover:bg-orange-700 active:bg-orange-800 font-bold text-lg"
                         >
                             <Icon path={mdiPlus} size={1} className="inline pb-1"/> Thêm
                         </button>
