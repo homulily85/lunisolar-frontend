@@ -1,16 +1,16 @@
-import {createSlice} from '@reduxjs/toolkit';
+import { createSlice } from "@reduxjs/toolkit";
 
 const uiSlice = createSlice({
-    name: 'ui',
+    name: "ui",
     initialState: {
-        showDialog: false
+        showDialog: false,
     },
     reducers: {
         setShowDialog(state, action) {
             state.showDialog = action.payload;
-        }
-    }
+        },
+    },
 });
 
 export default uiSlice.reducer;
-export const {setShowDialog} = uiSlice.actions;
+export const { setShowDialog } = uiSlice.actions;

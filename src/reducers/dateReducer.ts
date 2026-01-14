@@ -1,9 +1,9 @@
-import {createSlice} from '@reduxjs/toolkit';
+import { createSlice } from "@reduxjs/toolkit";
 
 const now = Date.now();
 
 const dateSlice = createSlice({
-    name: 'date',
+    name: "date",
     initialState: {
         currentSelectedSolarDate: now,
         today: now,
@@ -12,10 +12,8 @@ const dateSlice = createSlice({
         setCurrentSelectedSolarDate(state, action) {
             state.currentSelectedSolarDate = action.payload;
         },
-    }
+    },
 });
 
 export default dateSlice.reducer;
-export const {
-    setCurrentSelectedSolarDate,
-} = dateSlice.actions;
+export const { setCurrentSelectedSolarDate } = dateSlice.actions;
