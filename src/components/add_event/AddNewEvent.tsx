@@ -11,7 +11,7 @@ import {
 } from "@headlessui/react";
 import { useAppDispatch, useAppSelector } from "../../hook.ts";
 import { setShowDialog } from "../../reducers/uiReducer.ts";
-import { Fragment, useCallback, useState } from "react";
+import { Fragment, useCallback, useRef, useState } from "react";
 import TimePicker from "./TimePicker.tsx";
 import DatePicker from "./DatePicker.tsx";
 import { mdiChevronDown, mdiDelete, mdiPlus } from "@mdi/js";
@@ -58,13 +58,25 @@ const AddNewEvent = () => {
     const [selectedReminders, setSelectedReminders] = useState<
         (Option | null)[]
     >([]);
+    const [resetKey, setResetKey] = useState(0);
+
+    const formRef = useRef<HTMLFormElement | null>(null);
 
     const showDialog = useAppSelector((state) => state.ui.showDialog);
     const dispatch = useAppDispatch();
 
+    const resetDialog = useCallback(() => {
+        setIsAllDay(false);
+        setSelectedFrequency(frequency[0]);
+        setSelectedReminders([]);
+        formRef.current?.reset();
+        setResetKey((k) => k + 1); // bump to remount child pickers
+    }, []);
+
     const onClose = useCallback(() => {
         dispatch(setShowDialog(false));
-    }, [dispatch]);
+        resetDialog();
+    }, [dispatch, resetDialog]);
 
     const addReminder = useCallback(() => {
         setSelectedReminders((prev) => [...prev, null]);
@@ -104,7 +116,7 @@ const AddNewEvent = () => {
             className='relative z-50 dark:text-gray-200'>
             <DialogBackdrop className='fixed inset-0 bg-black/50' />
             <div className='fixed inset-0 flex w-screen items-center justify-center p-4'>
-                <DialogPanel className='space-y-4 bg-white px-8 py-6 rounded-xl w-xl dark:bg-gray-800 max-h-230 overflow-y-auto'>
+                <DialogPanel className='space-y-4 bg-white px-8 py-6 rounded-xl w-xl dark:bg-gray-800'>
                     <div className='grid grid-cols-[auto_1fr_auto]'>
                         <button
                             className='py-2 px-4 bg-gray-200 rounded-lg hover:bg-gray-300 font-bold dark:bg-gray-600 dark:hover:bg-gray-700'
@@ -121,7 +133,7 @@ const AddNewEvent = () => {
                         </button>
                     </div>
 
-                    <form className='w-full'>
+                    <form ref={formRef} className='w-full'>
                         <div className='relative w-full'>
                             <input
                                 type='text'
@@ -168,13 +180,16 @@ const AddNewEvent = () => {
                                 <div className='grid grid-cols-2 gap-2'>
                                     {!isAllDay && (
                                         <TimePicker
+                                            key={`start-time-${resetKey}`}
                                             name='start-time'
                                             id='start-time'
                                             className='justify-self-end'
                                         />
                                     )}
                                     <div className='col-start-2 col-end-3 justify-self-end'>
-                                        <DatePicker />
+                                        <DatePicker
+                                            key={`start-date-${resetKey}`}
+                                        />
                                     </div>
                                 </div>
 
@@ -182,13 +197,16 @@ const AddNewEvent = () => {
                                 <div className='grid grid-cols-2 gap-2'>
                                     {!isAllDay && (
                                         <TimePicker
+                                            key={`end-time-${resetKey}`}
                                             name='end-time'
                                             id='end-time'
                                             className='justify-self-end'
                                         />
                                     )}
                                     <div className='col-start-2 col-end-3 justify-self-end'>
-                                        <DatePicker />
+                                        <DatePicker
+                                            key={`end-date-${resetKey}`}
+                                        />
                                     </div>
                                 </div>
 
@@ -286,17 +304,19 @@ const AddNewEvent = () => {
                                     </Fragment>
                                 ))}
 
-                                <button
-                                    type='button'
-                                    onClick={addReminder}
-                                    className='col-span-2 justify-self-center flex items-center gap-2 justify-center hover:bg-gray-200 py-2 w-max rounded-md px-2 dark:hover:bg-gray-700'>
-                                    <Icon
-                                        className='inline-block'
-                                        path={mdiPlus}
-                                        size={1}
-                                    />
-                                    Thêm lịch nhắc nhở
-                                </button>
+                                {selectedReminders.length < 3 && (
+                                    <button
+                                        type='button'
+                                        onClick={addReminder}
+                                        className='col-span-2 justify-self-center flex items-center gap-2 justify-center hover:bg-gray-200 py-2 w-max rounded-md px-2 dark:hover:bg-gray-700'>
+                                        <Icon
+                                            className='inline-block'
+                                            path={mdiPlus}
+                                            size={1}
+                                        />
+                                        Thêm lịch nhắc nhở
+                                    </button>
+                                )}
                             </div>
                         </div>
                     </form>

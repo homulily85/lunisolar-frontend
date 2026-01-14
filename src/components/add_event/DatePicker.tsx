@@ -39,7 +39,6 @@ const DatePicker = () => {
                         <DayPicker
                             components={{ DayButton: DayButtonWithLunarDay }}
                             defaultMonth={selectedDate}
-                            captionLayout='dropdown'
                             locale={vi}
                             classNames={{
                                 today: "text-orange-800 dark:text-orange-500",
