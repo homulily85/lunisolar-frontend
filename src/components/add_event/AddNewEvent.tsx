@@ -14,10 +14,10 @@ import {setShowDialog} from '../../reducers/uiReducer.ts';
 import {useState} from 'react';
 import TimePicker from './TimePicker.tsx';
 import DatePicker from './DatePicker.tsx';
-import {mdiChevronDown, mdiPlus} from '@mdi/js';
+import {mdiChevronDown, mdiDelete, mdiPlus} from '@mdi/js';
 import Icon from '@mdi/react';
 
-const frequency = [
+const frequency: Record<string, string>[] = [
     {key: 'none', value: 'Không'},
     {key: 'everyday', value: 'Hàng ngày'},
     {key: 'everyweek', value: 'Hàng tuần'},
@@ -26,9 +26,34 @@ const frequency = [
     {key: 'every-year', value: 'Hàng năm'},
 ];
 
+const reminderTime: Record<string, string>[] = [
+    {key: '5-min', value: 'Trước 5 phút'},
+    {key: '10-min', value: 'Trước 10 phút'},
+    {key: '15-min', value: 'Trước 15 phút'},
+    {key: '30-min', value: 'Trước 30 phút'},
+    {key: '1-hour', value: 'Trước 1 giờ'},
+    {key: '2-hour', value: 'Trước 2 giờ'},
+    {key: '6-hour', value: 'Trước 6 giờ'},
+    {key: '12-hour', value: 'Trước 12 giờ'},
+    {key: '1-day', value: 'Trước 1 ngày'},
+    {key: '2-day', value: 'Trước 2 ngày'},
+    {key: '3-day', value: 'Trước 3 ngày'},
+    {key: '1-week', value: 'Trước 1 tuần'},
+    {key: '2-week', value: 'Trước 2 tuần'},
+    {key: '1-month', value: 'Trước 1 tháng'},
+];
+
+const EMPTY_REMINDER = {
+    key: '',
+    value: 'Chọn thời điểm',
+};
+
 const AddNewEvent = () => {
     const [isAllDay, setIsAllDay] = useState(false);
     const [selectedFrequency, setSelectedFrequency] = useState(frequency[0]);
+    const [reminderCount, setRemindersCount] = useState(0);
+    const [selectedReminder, setSelectedReminder] = useState<(Record<string, string> | null)[]>([]);
+
     const showDialog = useAppSelector(state => state.ui.showDialog);
     const dispatch = useAppDispatch();
 
@@ -122,7 +147,7 @@ const AddNewEvent = () => {
                                         checked={isAllDay}
                                         onChange={setIsAllDay}
                                         className="group inline-flex justify-self-end
-                                        h-6 w-11 items-center rounded-full bg-gray-600
+                                        h-6 w-11 items-center rounded-full bg-gray-300 dark:bg-gray-600
                                         transition data-checked:bg-orange-400"
                                     >
                                         <span
@@ -204,15 +229,74 @@ const AddNewEvent = () => {
                                 <fieldset className="text-lg font-bold">
                                     Nhắc nhở
                                 </fieldset>
-                                <div className="grid grid-cols-2">
-                                    <button type="button"
+                                <div className="grid grid-cols-[8fr_1fr] gap-2">
+                                    {Array.from({length: reminderCount}).map((_, idx) => {
+                                        return (
+                                            <>
+                                                <div key={idx}>
+                                                    <Listbox
+                                                        value={selectedReminder[idx] ?? EMPTY_REMINDER}
+                                                        onChange={(value) => {
+                                                            setSelectedReminder(prev => {
+                                                                const next = [...prev];
+                                                                next[idx] = value;
+                                                                return next;
+                                                            });
+                                                        }}
+                                                    >
+                                                        <ListboxButton
+                                                            className='relative block w-full
+                                                py-1.5 pr-8 pl-1 text-left border-b border-b-orange-300
+                                                focus:not-data-focus:outline-none data-focus:outline-2
+                                                data-focus:-outline-offset-2 data-focus:outline-white/25'
+                                                        >
+                                                            {selectedReminder[idx]?.value}
+                                                            <Icon
+                                                                className="group pointer-events-none absolute top-2.5 right-2.5"
+                                                                path={mdiChevronDown} size={1}/>
+                                                        </ListboxButton>
+                                                        <ListboxOptions anchor="bottom"
+                                                                        className='w-(--button-width)
+                                                        border border-white/5 bg-gray-100 dark:bg-gray-700
+                                                         [--anchor-gap:--spacing(1)] focus:outline-none'
+                                                        >
+                                                            {reminderTime
+                                                                .filter(r => !selectedReminder.find((o) => o == r))
+                                                                .map((r) => (
+                                                                    <ListboxOption key={r.key}
+                                                                                   value={r}
+                                                                                   className="group flex cursor-default
+                                                               items-center gap-2 rounded-lg px-3
+                                                               py-1.5 select-none data-focus:bg-gray-200
+                                                               dark:data-focus:bg-gray-600">
+                                                                        {r.value}
+                                                                    </ListboxOption>
+                                                                ))}
+                                                        </ListboxOptions>
+                                                    </Listbox>
+                                                </div>
+                                                <Icon key={`${idx}-trash`} path={mdiDelete}
+                                                      size={1}
+                                                      className='justify-self-center self-center'/>
+                                            </>
+                                        );
+                                    })}
+                                    <button type="button" onClick={() => {
+                                        setRemindersCount(reminderCount + 1);
+                                        setSelectedReminder(prev => {
+                                            const next = [...prev];
+                                            while (next.length < reminderCount + 1) {
+                                                next.push(null);
+                                            }
+                                            return next;
+                                        });
+                                    }}
                                             className="col-span-2 justify-self-center flex items-center
                                             gap-2 justify-center hover:bg-gray-200 py-2 w-max rounded-md px-2
                                             dark:hover:bg-gray-700 ">
                                         <Icon className="inline-block" path={mdiPlus} size={1}/>
                                         Thêm lịch nhắc nhở
                                     </button>
-
                                 </div>
                             </div>
                         </form>
@@ -221,7 +305,6 @@ const AddNewEvent = () => {
             </Dialog>
         </>
     );
-
 };
 
 export default AddNewEvent;
