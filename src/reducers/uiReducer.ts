@@ -3,13 +3,9 @@ import {createSlice} from '@reduxjs/toolkit';
 const uiSlice = createSlice({
     name: 'ui',
     initialState: {
-        showSidebar: true,
         showDialog: false
     },
     reducers: {
-        setShowSidebar(state, action) {
-            state.showSidebar = action.payload;
-        },
         setShowDialog(state, action) {
             state.showDialog = action.payload;
         }
@@ -17,4 +13,4 @@ const uiSlice = createSlice({
 });
 
 export default uiSlice.reducer;
-export const {setShowSidebar, setShowDialog} = uiSlice.actions;
+export const {setShowDialog} = uiSlice.actions;

@@ -1,7 +1,7 @@
 import Calendar from './components/calendar/Calendar.tsx';
 import Sidebar from './components/Sidebar.tsx';
 import NavBar from './components/NavBar.tsx';
-import AddNewEvent from './components/add/AddNewEvent.tsx';
+import AddNewEvent from './components/add_event/AddNewEvent.tsx';
 
 function App() {
 

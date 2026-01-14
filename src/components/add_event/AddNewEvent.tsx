@@ -1,14 +1,33 @@
-import {Dialog, DialogBackdrop, DialogPanel, DialogTitle} from '@headlessui/react';
+import {
+    Dialog,
+    DialogBackdrop,
+    DialogPanel,
+    DialogTitle,
+    Listbox,
+    ListboxButton,
+    ListboxOption,
+    ListboxOptions
+} from '@headlessui/react';
 import {useAppDispatch, useAppSelector} from '../../hook.ts';
 import {setShowDialog} from '../../reducers/uiReducer.ts';
 import {useState} from 'react';
 import TimePicker from './TimePicker.tsx';
 import DatePicker from './DatePicker.tsx';
-import {mdiPlus} from '@mdi/js';
+import {mdiChevronDown, mdiPlus} from '@mdi/js';
 import Icon from '@mdi/react';
+
+const frequency = [
+    {key: 'none', value: 'Không'},
+    {key: 'everyday', value: 'Hàng ngày'},
+    {key: 'everyweek', value: 'Hàng tuần'},
+    {key: 'every-two-weeks', value: 'Mỗi hai tuần'},
+    {key: 'every-month', value: 'Hàng tháng'},
+    {key: 'every-year', value: 'Hàng năm'},
+];
 
 const AddNewEvent = () => {
     const [isAllDay, setIsAllDay] = useState(false);
+    const [selectedFrequency, setSelectedFrequency] = useState(frequency[0]);
     const showDialog = useAppSelector(state => state.ui.showDialog);
     const dispatch = useAppDispatch();
 
@@ -22,25 +41,26 @@ const AddNewEvent = () => {
 
     return (
         <>
-            <Dialog open={showDialog} onClose={onClose} className="relative z-50">
+            <Dialog open={showDialog} onClose={onClose}
+                    className="relative z-50 dark:text-gray-200">
                 <DialogBackdrop className="fixed inset-0 bg-black/50"/>
                 <div
                     className="fixed inset-0 flex w-screen items-center justify-center p-4">
                     <DialogPanel
-                        className="space-y-4 bg-white px-8 py-6 rounded-xl w-xl">
+                        className="space-y-4 bg-white px-8 py-6 rounded-xl w-xl dark:bg-gray-800">
                         <div className="grid grid-cols-[auto_1fr_auto]">
                             <button className="py-2 px-4 bg-gray-200 rounded-lg hover:bg-gray-300
-                            font-bold"
+                            font-bold dark:bg-gray-600 dark:hover:bg-gray-700"
                                     onClick={onClose}>
                                 Hủy
                             </button>
                             <DialogTitle
-                                className="font-bold text-2xl text-center self-center">
+                                className="font-bold text-2xl text-center self-center ">
                                 Thêm sự kiện
                             </DialogTitle>
                             <button
                                 className="py-2 px-4 bg-orange-300 rounded-lg hover:bg-orange-400
-                                font-bold"
+                                font-bold dark:bg-orange-700 dark:hover:bg-orange-800"
                                 onClick={onClose}>Thêm
                             </button>
 
@@ -53,7 +73,8 @@ const AddNewEvent = () => {
                                     required
                                     placeholder=" "
                                     className="peer w-full border border-gray-300 rounded
-                                    px-3 pt-4 pb-2 text-lg focus:outline-none focus:border-orange-300"
+                                    px-3 pt-4 pb-2 text-lg focus:outline-none focus:border-orange-300
+                                    dark:border-gray-500 "
                                 />
 
                                 <label
@@ -61,7 +82,11 @@ const AddNewEvent = () => {
                                     className="absolute left-3 bg-white px-1 text-gray-500 transition-all
                                     duration-200 peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-1/2
                                     peer-placeholder-shown:text-lg peer-focus:-top-2 peer-focus:text-sm
-                                    peer-focus:translate-y-0"
+                                    peer-not-placeholder-shown:-top-2
+                                    peer-not-placeholder-shown:translate-y-0
+                                    peer-not-placeholder-shown:text-sm
+                                    peer-focus:translate-y-0 dark:bg-gray-800 dark:text-gray-200
+                                    "
                                 >
                                     Tiêu đề
                                 </label>
@@ -73,7 +98,11 @@ const AddNewEvent = () => {
                                     id="location"
                                     placeholder=" "
                                     className="peer w-full border border-gray-300 rounded
-                                    px-3 pt-4 pb-2 text-lg focus:outline-none focus:border-orange-300"
+                                    px-3 pt-4 pb-2 text-lg focus:outline-none focus:border-orange-300
+                                    peer-not-placeholder-shown:-top-2
+                                    peer-not-placeholder-shown:translate-y-0
+                                    peer-not-placeholder-shown:text-sm
+                                    dark:border-gray-500"
                                 />
 
                                 <label
@@ -81,7 +110,7 @@ const AddNewEvent = () => {
                                     className="absolute left-3 bg-white px-1 text-gray-500 transition-all
                                     duration-200 peer-placeholder-shown:top-1/2 peer-placeholder-shown:-translate-y-1/2
                                     peer-placeholder-shown:text-lg peer-focus:-top-2 peer-focus:text-sm
-                                    peer-focus:translate-y-0"
+                                    peer-focus:translate-y-0 dark:bg-gray-800 dark:text-gray-200"
                                 >
                                     Địa điểm
                                 </label>
@@ -115,25 +144,36 @@ const AddNewEvent = () => {
                                         </div>
                                     </div>
 
-                                    <label htmlFor="repeat" className="self-center">Lặp lại</label>
-                                    <select name="repeat" id="repeat"
-                                            className="justify-self-end w-full py-1
-                                             focus:outline-none border-b border-b-orange-300
-                                             focus:border-b-2">
-                                        <option value='no' key='no'>Không</option>
-                                        <option value='everyday' key='everyday'>Hàng ngày
-                                        </option>
-                                        <option value='everyweek' key='everyweek'>Hàng tuần
-                                        </option>
-                                        <option value='every-two-weeks'
-                                                key='every-two-weeks'>Mỗi
-                                            hai tuần
-                                        </option>
-                                        <option value='every-month' key='every-month'>Hàng tháng
-                                        </option>
-                                        <option value='every-year' key='every-year'>Hàng năm
-                                        </option>
-                                    </select>
+                                    <label className="self-center">Lặp lại</label>
+                                    <Listbox value={selectedFrequency}
+                                             onChange={setSelectedFrequency}>
+                                        <ListboxButton
+                                            className='relative block w-full
+                                                py-1.5 pr-8 pl-1 text-left border-b border-b-orange-300
+                                                focus:not-data-focus:outline-none data-focus:outline-2
+                                                data-focus:-outline-offset-2 data-focus:outline-white/25'
+                                        >
+                                            {selectedFrequency.value}
+                                            <Icon
+                                                className="group pointer-events-none absolute top-2.5 right-2.5"
+                                                path={mdiChevronDown} size={1}/>
+                                        </ListboxButton>
+                                        <ListboxOptions anchor="bottom"
+                                                        className='w-(--button-width)
+                                                        border border-white/5 bg-gray-100 dark:bg-gray-700
+                                                         [--anchor-gap:--spacing(1)] focus:outline-none'
+                                        >
+                                            {frequency.map((f) => (
+                                                <ListboxOption key={f.key} value={f}
+                                                               className="group flex cursor-default
+                                                               items-center gap-2 rounded-lg px-3
+                                                               py-1.5 select-none data-focus:bg-gray-200
+                                                               dark:data-focus:bg-gray-600">
+                                                    {f.value}
+                                                </ListboxOption>
+                                            ))}
+                                        </ListboxOptions>
+                                    </Listbox>
                                 </div>
                             </fieldset>
 
@@ -162,7 +202,8 @@ const AddNewEvent = () => {
                                 <div className="grid grid-cols-2">
                                     <button type="button"
                                             className="col-span-2 justify-self-center flex items-center
-                                            gap-2 justify-center hover:bg-gray-200 py-2 w-max rounded-md px-2">
+                                            gap-2 justify-center hover:bg-gray-200 py-2 w-max rounded-md px-2
+                                            dark:hover:bg-gray-700 ">
                                         <Icon className="inline-block" path={mdiPlus} size={1}/>
                                         Thêm lịch nhắc nhở
                                     </button>

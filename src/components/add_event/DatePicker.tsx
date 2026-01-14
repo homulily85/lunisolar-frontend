@@ -41,8 +41,8 @@ const DatePicker = () => {
                         locale={vi}
                         classNames={{
                             today: 'text-orange-800 dark:text-orange-500',
-                            selected: 'bg-amber-500 border-amber-500 rounded-md text-white dark:text-white',
-                            root: `${defaultClassNames.root} shadow-lg p-5`,
+                            selected: 'bg-amber-500 border-amber-500 rounded-md text-white dark:text-white dark:bg-orange-600',
+                            root: `${defaultClassNames.root} shadow-lg p-5 dark:bg-gray-800`,
                             chevron: `${defaultClassNames.chevron} fill-amber-500`,
                         }}
                         mode="single"
