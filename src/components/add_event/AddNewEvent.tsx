@@ -104,7 +104,7 @@ const AddNewEvent = () => {
             className='relative z-50 dark:text-gray-200'>
             <DialogBackdrop className='fixed inset-0 bg-black/50' />
             <div className='fixed inset-0 flex w-screen items-center justify-center p-4'>
-                <DialogPanel className='space-y-4 bg-white px-8 py-6 rounded-xl w-xl dark:bg-gray-800'>
+                <DialogPanel className='space-y-4 bg-white px-8 py-6 rounded-xl w-xl dark:bg-gray-800 max-h-230 overflow-y-auto'>
                     <div className='grid grid-cols-[auto_1fr_auto]'>
                         <button
                             className='py-2 px-4 bg-gray-200 rounded-lg hover:bg-gray-300 font-bold dark:bg-gray-600 dark:hover:bg-gray-700'
