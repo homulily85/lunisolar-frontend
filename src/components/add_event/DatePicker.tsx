@@ -29,8 +29,7 @@ const DatePicker = () => {
                 readOnly
                 value={selectedDate?.toLocaleDateString('vi-VN')}
                 onClick={() => setOpen(o => !o)}
-                className="border rounded py-1 w-full cursor-pointer border-b-orange-300 border-b border-transparent
-                focus:outline-none focus:border-b-2"
+                className="border rounded py-1 w-full cursor-pointer border-b-orange-300 border-b border-transparent focus:outline-none focus:border-b-2"
             />
             {open && (
                 <div className="absolute z-50 mt-2 bg-white shadow-lg rounded ">

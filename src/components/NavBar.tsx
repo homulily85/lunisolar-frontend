@@ -51,8 +51,7 @@ const NavBar = () => {
 
                 <button
                     onClick={jumpToToday}
-                    className="hover:bg-gray-200 active:bg-gray-300 rounded-xl border py-2 px-8 border-gray-400
-                     dark:hover:bg-gray-700 dark:active:bg-gray-800"
+                    className="hover:bg-gray-200 active:bg-gray-300 rounded-xl border py-2 px-8 border-gray-400 dark:hover:bg-gray-700 dark:active:bg-gray-800"
                     aria-label="Jump to today"
                 >
                     Hôm nay
@@ -60,9 +59,7 @@ const NavBar = () => {
             </div>
             <div className="flex justify-center items-center gap-2">
                 <button
-                    className="hover:bg-gray-200 active:bg-gray-300
-                     dark:hover:bg-gray-700 dark:active:bg-gray-800
-                     rounded-lg py-2 px-2">
+                    className="hover:bg-gray-200 active:bg-gray-300 dark:hover:bg-gray-700 dark:active:bg-gray-800 rounded-lg py-2 px-2">
                 </button>
             </div>
         </div>
