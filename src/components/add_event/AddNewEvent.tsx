@@ -6,7 +6,8 @@ import {
     Listbox,
     ListboxButton,
     ListboxOption,
-    ListboxOptions
+    ListboxOptions,
+    Switch
 } from '@headlessui/react';
 import {useAppDispatch, useAppSelector} from '../../hook.ts';
 import {setShowDialog} from '../../reducers/uiReducer.ts';
@@ -33,10 +34,6 @@ const AddNewEvent = () => {
 
     const onClose = () => {
         dispatch(setShowDialog(false));
-    };
-
-    const switchIsAllDay = () => {
-        setIsAllDay(!isAllDay);
     };
 
     return (
@@ -118,11 +115,19 @@ const AddNewEvent = () => {
 
                             <fieldset className="my-4">
                                 <legend className="text-lg font-bold">Thời gian</legend>
-                                <div className="grid grid-cols-2 my-2 text-lg gap-1 "><label
-                                    htmlFor="isAllDay"> Cả ngày </label>
+                                <div className="grid grid-cols-2 my-2 text-lg gap-1 ">
+                                    <label> Cả ngày </label>
 
-                                    <input type="checkbox" id="isAllDay" onChange={switchIsAllDay}
-                                           className="justify-self-end w-5 h-5 accent-orange-400"/>
+                                    <Switch
+                                        checked={isAllDay}
+                                        onChange={setIsAllDay}
+                                        className="group inline-flex justify-self-end
+                                        h-6 w-11 items-center rounded-full bg-gray-600
+                                        transition data-checked:bg-orange-400"
+                                    >
+                                        <span
+                                            className="size-4 translate-x-1 rounded-full bg-white transition group-data-checked:translate-x-6"/>
+                                    </Switch>
 
                                     <label className="self-center">Bắt đầu</label>
                                     <div className="grid grid-cols-2 gap-2">
