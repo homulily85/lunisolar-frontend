@@ -1,14 +1,30 @@
-import React from "react";
+import { useEffect, useRef, useState } from "react";
 import type { DayInfo } from "../../type.ts";
+import Popup from "../Popup.tsx";
 
-const DayCell = React.memo(function DayCell({
+const DayCell = ({
     info,
     onSelect,
 }: {
     info: DayInfo;
     onSelect: (ts: number) => void;
-}) {
+}) => {
     const { date, ts, lunarText, isToday, isSelected, isCurrentMonth } = info;
+
+    const [open, setOpen] = useState(false);
+    const popupRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        function handleClickOutside(e: MouseEvent) {
+            if (!popupRef.current?.contains(e.target as Node)) {
+                setOpen(false);
+            }
+        }
+
+        document.addEventListener("mousedown", handleClickOutside);
+        return () =>
+            document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
 
     const bgClass = isSelected
         ? "bg-orange-200 dark:bg-orange-700"
@@ -25,13 +41,17 @@ const DayCell = React.memo(function DayCell({
     return (
         <div
             data-date={ts}
-            onClick={() => onSelect(ts)}
-            className={`${bgClass} justify-items-center rounded-lg py-2 px-4 h-full 
+            onClick={() => {
+                setOpen(true);
+                onSelect(ts);
+            }}
+            className={`relative ${bgClass} justify-items-center rounded-lg py-2 px-4 h-full 
                         ${isSelected ? "" : " hover:bg-gray-100 dark:hover:bg-gray-600"}`}>
             <p className={`text-lg ${textColor}`}>{date.getDate()}</p>
             <p className={`text-sm ${textColor}`}>{lunarText}</p>
+            {open && <Popup popupRef={popupRef} setOpen={setOpen} />}
         </div>
     );
-});
+};
 
 export default DayCell;

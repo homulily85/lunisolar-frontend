@@ -44,7 +44,7 @@ const Sidebar = () => {
     const lunarYearCanChi = selectedLunarDate?.yearCanChi ?? "";
 
     return (
-        <div className='h-screen grid grid-rows-[1fr_10fr] p-2 bg-gray-150 dark:bg-gray-900 dark:text-white'>
+        <div className='h-screen grid grid-rows-[1fr_10fr] gap-2 p-2 bg-gray-150 dark:bg-gray-900 dark:text-white'>
             <div>
                 <p className='text-9xl font-bold text-center text-orange-600'>
                     {day}
@@ -65,6 +65,12 @@ const Sidebar = () => {
                         Thêm
                     </button>
                 </div>
+            </div>
+            <div className='px-2'>
+                <p className='font-bold text-lg'>Sự kiện</p>
+                <p className='mt-2'>
+                    <em>Không có sự kiện</em>
+                </p>
             </div>
         </div>
     );

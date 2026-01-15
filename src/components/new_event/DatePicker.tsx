@@ -1,4 +1,10 @@
-import React, { useEffect, useRef, useState } from "react";
+import {
+    type Dispatch,
+    type SetStateAction,
+    useEffect,
+    useRef,
+    useState,
+} from "react";
 import { DayPicker, getDefaultClassNames } from "react-day-picker";
 import { vi } from "react-day-picker/locale";
 import DayButtonWithLunarDay from "./DayButtonWithLunarDay.tsx";
@@ -8,7 +14,7 @@ const DatePicker = ({
     setValue,
 }: {
     value: Date;
-    setValue: React.Dispatch<React.SetStateAction<Date>>;
+    setValue: Dispatch<SetStateAction<Date>>;
 }) => {
     const [open, setOpen] = useState(false);
     const ref = useRef<HTMLDivElement>(null);

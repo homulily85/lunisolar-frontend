@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import { type Dispatch, type SetStateAction, useMemo } from "react";
 import timesToPick from "../../utils/timesToPick.ts";
 
 const TimePicker = ({
@@ -11,7 +11,7 @@ const TimePicker = ({
     name: string;
     id: string;
     value: string;
-    setValue: React.Dispatch<React.SetStateAction<string>>;
+    setValue: Dispatch<SetStateAction<string>>;
     className: string;
 }) => {
     const times = useMemo(() => timesToPick(), []);

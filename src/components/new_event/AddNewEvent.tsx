@@ -150,9 +150,9 @@ const AddNewEvent = () => {
                             Sự kiện mới
                         </DialogTitle>
                         <button
-                            className='py-2 px-4 bg-orange-300 rounded-lg hover:bg-orange-400 font-bold dark:bg-orange-700 dark:hover:bg-orange-800'
+                            className='py-2 px-4 bg-orange-200 rounded-lg hover:bg-orange-300 font-bold dark:bg-orange-700 dark:hover:bg-orange-800'
                             onClick={onClose}>
-                            Tạo
+                            Thêm
                         </button>
                     </div>
 
