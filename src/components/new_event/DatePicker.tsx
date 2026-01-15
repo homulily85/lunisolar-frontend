@@ -1,15 +1,16 @@
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { DayPicker, getDefaultClassNames } from "react-day-picker";
 import { vi } from "react-day-picker/locale";
-import { useAppSelector } from "../../hook.ts";
 import DayButtonWithLunarDay from "./DayButtonWithLunarDay.tsx";
 
-const DatePicker = () => {
-    const selectedTs = useAppSelector((s) => s.date.currentSelectedSolarDate);
+const DatePicker = ({
+    value,
+    setValue,
+}: {
+    value: Date;
+    setValue: React.Dispatch<React.SetStateAction<Date>>;
+}) => {
     const [open, setOpen] = useState(false);
-    const [selectedDate, setSelectedDate] = useState<Date | undefined>(
-        new Date(selectedTs),
-    );
     const ref = useRef<HTMLDivElement>(null);
     const defaultClassNames = getDefaultClassNames();
 
@@ -30,7 +31,7 @@ const DatePicker = () => {
                 <input
                     type='text'
                     readOnly
-                    value={selectedDate?.toLocaleDateString("vi-VN")}
+                    value={value?.toLocaleDateString("vi-VN")}
                     onClick={() => setOpen((o) => !o)}
                     className='border rounded py-1 w-full cursor-pointer border-b-orange-300 border-b border-transparent focus:outline-none focus:border-b-2'
                 />
@@ -38,7 +39,7 @@ const DatePicker = () => {
                     <div className='absolute z-50 mt-2 bg-white shadow-lg rounded '>
                         <DayPicker
                             components={{ DayButton: DayButtonWithLunarDay }}
-                            defaultMonth={selectedDate}
+                            defaultMonth={value}
                             locale={vi}
                             classNames={{
                                 today: "text-orange-800 dark:text-orange-500",
@@ -48,9 +49,9 @@ const DatePicker = () => {
                                 chevron: `${defaultClassNames.chevron} fill-amber-500`,
                             }}
                             mode='single'
-                            selected={selectedDate}
+                            selected={value}
                             onSelect={(date) => {
-                                setSelectedDate(date);
+                                setValue(date as Date);
                                 setOpen(false);
                             }}
                         />

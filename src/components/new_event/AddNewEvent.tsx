@@ -11,7 +11,7 @@ import {
 } from "@headlessui/react";
 import { useAppDispatch, useAppSelector } from "../../hook.ts";
 import { setShowDialog } from "../../reducers/uiReducer.ts";
-import { Fragment, useCallback, useRef, useState } from "react";
+import { Fragment, useCallback, useEffect, useState } from "react";
 import TimePicker from "./TimePicker.tsx";
 import DatePicker from "./DatePicker.tsx";
 import { mdiChevronDown, mdiDelete, mdiPlus } from "@mdi/js";
@@ -51,26 +51,43 @@ const EMPTY_REMINDER: Option = {
 };
 
 const AddNewEvent = () => {
+    const selectedTs = useAppSelector((s) => s.date.currentSelectedSolarDate);
+    const [title, setTitle] = useState("");
+    const [location, setLocation] = useState("");
+
     const [isAllDay, setIsAllDay] = useState(false);
+
+    const [selectedStartDate, setSelectedStartDate] = useState<Date>(
+        new Date(selectedTs),
+    );
+    const [selectedStartTime, setSelectedStartTime] = useState("00:00");
+    const [selectedEndTime, setSelectedEndTime] = useState("00:00");
+    const [selectedEndDate, setSelectedEndDate] = useState<Date>(
+        new Date(selectedTs),
+    );
+
     const [selectedFrequency, setSelectedFrequency] = useState<Option>(
         frequency[0],
     );
+
+    const [description, setDescription] = useState("");
+
     const [selectedReminders, setSelectedReminders] = useState<
         (Option | null)[]
     >([]);
-    const [resetKey, setResetKey] = useState(0);
-
-    const formRef = useRef<HTMLFormElement | null>(null);
 
     const showDialog = useAppSelector((state) => state.ui.showDialog);
     const dispatch = useAppDispatch();
 
     const resetDialog = useCallback(() => {
+        setTitle("");
+        setLocation("");
         setIsAllDay(false);
         setSelectedFrequency(frequency[0]);
         setSelectedReminders([]);
-        formRef.current?.reset();
-        setResetKey((k) => k + 1); // bump to remount child pickers
+        setDescription("");
+        setSelectedStartTime("00:00");
+        setSelectedEndTime("00:00");
     }, []);
 
     const onClose = useCallback(() => {
@@ -109,6 +126,12 @@ const AddNewEvent = () => {
         [selectedReminders],
     );
 
+    useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setSelectedStartDate(new Date(selectedTs));
+        setSelectedEndDate(new Date(selectedTs));
+    }, [selectedTs]);
+
     return (
         <Dialog
             open={showDialog}
@@ -124,18 +147,22 @@ const AddNewEvent = () => {
                             Hủy
                         </button>
                         <DialogTitle className='font-bold text-2xl text-center self-center'>
-                            Thêm sự kiện
+                            Sự kiện mới
                         </DialogTitle>
                         <button
                             className='py-2 px-4 bg-orange-300 rounded-lg hover:bg-orange-400 font-bold dark:bg-orange-700 dark:hover:bg-orange-800'
                             onClick={onClose}>
-                            Thêm
+                            Tạo
                         </button>
                     </div>
 
-                    <form ref={formRef} className='w-full'>
+                    <form className='w-full'>
                         <div className='relative w-full'>
                             <input
+                                value={title}
+                                onChange={({ target }) => {
+                                    setTitle(target.value);
+                                }}
                                 type='text'
                                 id='title'
                                 required
@@ -151,6 +178,10 @@ const AddNewEvent = () => {
 
                         <div className='relative w-full my-4'>
                             <input
+                                value={location}
+                                onChange={({ target }) => {
+                                    setLocation(target.value);
+                                }}
                                 type='text'
                                 id='location'
                                 placeholder=' '
@@ -180,15 +211,17 @@ const AddNewEvent = () => {
                                 <div className='grid grid-cols-2 gap-2'>
                                     {!isAllDay && (
                                         <TimePicker
-                                            key={`start-time-${resetKey}`}
                                             name='start-time'
                                             id='start-time'
+                                            value={selectedStartTime}
+                                            setValue={setSelectedStartTime}
                                             className='justify-self-end'
                                         />
                                     )}
                                     <div className='col-start-2 col-end-3 justify-self-end'>
                                         <DatePicker
-                                            key={`start-date-${resetKey}`}
+                                            value={selectedStartDate}
+                                            setValue={setSelectedStartDate}
                                         />
                                     </div>
                                 </div>
@@ -197,15 +230,17 @@ const AddNewEvent = () => {
                                 <div className='grid grid-cols-2 gap-2'>
                                     {!isAllDay && (
                                         <TimePicker
-                                            key={`end-time-${resetKey}`}
                                             name='end-time'
                                             id='end-time'
+                                            value={selectedEndTime}
+                                            setValue={setSelectedEndTime}
                                             className='justify-self-end'
                                         />
                                     )}
                                     <div className='col-start-2 col-end-3 justify-self-end'>
                                         <DatePicker
-                                            key={`end-date-${resetKey}`}
+                                            value={selectedEndDate}
+                                            setValue={setSelectedEndDate}
                                         />
                                     </div>
                                 </div>
@@ -245,6 +280,10 @@ const AddNewEvent = () => {
                                 Mô tả
                             </label>
                             <textarea
+                                value={description}
+                                onChange={({ target }) => {
+                                    setDescription(target.value);
+                                }}
                                 id='description'
                                 placeholder=' '
                                 className='peer w-full border border-gray-300 rounded px-3 pt-4 pb-2  focus:outline-none focus:border-orange-300 resize-none h-40!'
