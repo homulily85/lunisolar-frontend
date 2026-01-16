@@ -16,6 +16,8 @@ import TimePicker from "./TimePicker.tsx";
 import DatePicker from "./DatePicker.tsx";
 import { mdiChevronDown, mdiDelete, mdiPlus } from "@mdi/js";
 import Icon from "@mdi/react";
+import { toast } from "react-toastify";
+import { z } from "zod";
 
 type Option = { key: string; value: string };
 
@@ -66,9 +68,7 @@ const AddNewEvent = () => {
         new Date(selectedTs),
     );
 
-    const [selectedFrequency, setSelectedFrequency] = useState<Option>(
-        frequency[0],
-    );
+    const [selectedRepeat, setSelectedRepeat] = useState<Option>(frequency[0]);
 
     const [description, setDescription] = useState("");
 
@@ -83,14 +83,14 @@ const AddNewEvent = () => {
         setTitle("");
         setLocation("");
         setIsAllDay(false);
-        setSelectedFrequency(frequency[0]);
+        setSelectedRepeat(frequency[0]);
         setSelectedReminders([]);
         setDescription("");
         setSelectedStartTime("00:00");
         setSelectedEndTime("00:00");
     }, []);
 
-    const onClose = useCallback(() => {
+    const closeDialog = useCallback(() => {
         dispatch(setShowDialog(false));
         resetDialog();
     }, [dispatch, resetDialog]);
@@ -132,10 +132,54 @@ const AddNewEvent = () => {
         setSelectedEndDate(new Date(selectedTs));
     }, [selectedTs]);
 
+    const saveNewEvent = () => {
+        if (title.trim() === "") {
+            toast.error("Trường tiêu đề không được trống!");
+            return;
+        }
+
+        const startTimeParsed = z.iso.time().safeParse(selectedStartTime);
+        if (!startTimeParsed.success) {
+            toast.error("Thời gian bắt đầu không hợp lệ!");
+            return;
+        }
+
+        const endTimeParsed = z.iso.time().safeParse(selectedEndTime);
+        if (!endTimeParsed.success) {
+            toast.error("Thời gian kết thúc không hợp lệ!");
+            return;
+        }
+
+        const startDateTime = new Date(
+            selectedStartDate.getFullYear(),
+            selectedStartDate.getMonth(),
+            selectedStartDate.getDate(),
+            ...startTimeParsed.data.split(":").map(Number),
+        );
+
+        const endDateTime = new Date(
+            selectedEndDate.getFullYear(),
+            selectedEndDate.getMonth(),
+            selectedEndDate.getDate(),
+            ...endTimeParsed.data.split(":").map(Number),
+        );
+
+        if (!(startDateTime <= endDateTime)) {
+            toast.error("Thời điểm kết thúc phải lớn hơn thời điểm bắt đầu!");
+        }
+
+        for (const reminder of selectedReminders) {
+            if (!reminder) {
+                toast.error("Bạn cần chọn thời điểm nhắc nhớ!");
+                return;
+            }
+        }
+    };
+
     return (
         <Dialog
             open={showDialog}
-            onClose={onClose}
+            onClose={closeDialog}
             className='relative z-50 dark:text-gray-200'>
             <DialogBackdrop className='fixed inset-0 bg-black/50' />
             <div className='fixed inset-0 flex w-screen items-center justify-center p-4'>
@@ -143,7 +187,7 @@ const AddNewEvent = () => {
                     <div className='grid grid-cols-[auto_1fr_auto]'>
                         <button
                             className='py-2 px-4 bg-gray-200 rounded-lg hover:bg-gray-300 font-bold dark:bg-gray-600 dark:hover:bg-gray-700'
-                            onClick={onClose}>
+                            onClick={closeDialog}>
                             Hủy
                         </button>
                         <DialogTitle className='font-bold text-2xl text-center self-center'>
@@ -151,7 +195,9 @@ const AddNewEvent = () => {
                         </DialogTitle>
                         <button
                             className='py-2 px-4 bg-orange-200 rounded-lg hover:bg-orange-300 font-bold dark:bg-orange-700 dark:hover:bg-orange-800'
-                            onClick={onClose}>
+                            onClick={() => {
+                                saveNewEvent();
+                            }}>
                             Thêm
                         </button>
                     </div>
@@ -247,10 +293,10 @@ const AddNewEvent = () => {
 
                                 <label className='self-center'>Lặp lại</label>
                                 <Listbox
-                                    value={selectedFrequency}
-                                    onChange={setSelectedFrequency}>
+                                    value={selectedRepeat}
+                                    onChange={setSelectedRepeat}>
                                     <ListboxButton className='relative block w-full py-1.5 pr-8 pl-1 text-left border-b border-b-orange-300 focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-white/25'>
-                                        {selectedFrequency.value}
+                                        {selectedRepeat.value}
                                         <Icon
                                             className='group pointer-events-none absolute top-2.5 right-2.5'
                                             path={mdiChevronDown}

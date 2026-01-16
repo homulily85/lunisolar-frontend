@@ -2,6 +2,8 @@ import Calendar from "./components/calendar/Calendar.tsx";
 import Sidebar from "./components/Sidebar.tsx";
 import NavBar from "./components/NavBar.tsx";
 import AddNewEvent from "./components/new_event/AddNewEvent.tsx";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function App() {
     return (
@@ -19,6 +21,11 @@ function App() {
                 <Calendar />
             </div>
             <AddNewEvent />
+            <ToastContainer
+                theme={"dark"}
+                position='top-right'
+                autoClose={3000}
+            />
         </div>
     );
 }
