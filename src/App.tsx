@@ -4,8 +4,29 @@ import NavBar from "./components/NavBar.tsx";
 import AddNewEvent from "./components/new_event/AddNewEvent.tsx";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useEffect, useState } from "react";
 
 function App() {
+    const [theme, setTheme] = useState<"light" | "dark">(() =>
+        window.matchMedia("(prefers-color-scheme: dark)").matches
+            ? "dark"
+            : "light",
+    );
+
+    useEffect(() => {
+        const media = window.matchMedia("(prefers-color-scheme: dark)");
+
+        const handler = (e: MediaQueryListEvent) => {
+            setTheme(e.matches ? "dark" : "light");
+        };
+
+        media.addEventListener("change", handler);
+
+        return () => {
+            media.removeEventListener("change", handler);
+        };
+    }, []);
+
     return (
         <div
             className={
@@ -22,7 +43,7 @@ function App() {
             </div>
             <AddNewEvent />
             <ToastContainer
-                theme={"dark"}
+                theme={theme}
                 position='top-right'
                 autoClose={3000}
             />
