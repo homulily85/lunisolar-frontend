@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { DayInfo } from "../../type.ts";
-import Popup from "../Popup.tsx";
+import AddEventPopup from "../popup/AddEventPopup.tsx";
+import { useAppSelector } from "../../hook.ts";
 
 const DayCell = ({
     info,
@@ -13,6 +14,7 @@ const DayCell = ({
 
     const [open, setOpen] = useState(false);
     const popupRef = useRef<HTMLDivElement>(null);
+    const token = useAppSelector((state) => state.user.token);
 
     useEffect(() => {
         function handleClickOutside(e: MouseEvent) {
@@ -49,7 +51,9 @@ const DayCell = ({
                         ${isSelected ? "" : " hover:bg-gray-100 dark:hover:bg-gray-600"}`}>
             <p className={`text-lg ${textColor}`}>{date.getDate()}</p>
             <p className={`text-sm ${textColor}`}>{lunarText}</p>
-            {open && <Popup popupRef={popupRef} setOpen={setOpen} />}
+            {open && token && (
+                <AddEventPopup popupRef={popupRef} setOpen={setOpen} />
+            )}
         </div>
     );
 };

@@ -6,11 +6,11 @@ const uiSlice = createSlice({
         showDialog: false,
     },
     reducers: {
-        setShowDialog(state, action) {
+        setShowAddEventDialog(state, action) {
             state.showDialog = action.payload;
         },
     },
 });
 
 export default uiSlice.reducer;
-export const { setShowDialog } = uiSlice.actions;
+export const { setShowAddEventDialog } = uiSlice.actions;

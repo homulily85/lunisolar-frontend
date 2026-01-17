@@ -10,7 +10,7 @@ import {
     Switch,
 } from "@headlessui/react";
 import { useAppDispatch, useAppSelector } from "../../hook.ts";
-import { setShowDialog } from "../../reducers/uiReducer.ts";
+import { setShowAddEventDialog } from "../../reducers/uiReducer.ts";
 import { Fragment, useCallback, useEffect, useState } from "react";
 import TimePicker from "./TimePicker.tsx";
 import DatePicker from "./DatePicker.tsx";
@@ -91,7 +91,7 @@ const AddNewEvent = () => {
     }, []);
 
     const closeDialog = useCallback(() => {
-        dispatch(setShowDialog(false));
+        dispatch(setShowAddEventDialog(false));
         resetDialog();
     }, [dispatch, resetDialog]);
 
@@ -174,6 +174,8 @@ const AddNewEvent = () => {
                 return;
             }
         }
+
+        closeDialog();
     };
 
     return (

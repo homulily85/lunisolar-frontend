@@ -7,12 +7,12 @@ import {
     useLayoutEffect,
     useState,
 } from "react";
-import { useAppDispatch } from "../hook.ts";
-import { setShowDialog } from "../reducers/uiReducer.ts";
+import { useAppDispatch } from "../../hook.ts";
+import { setShowAddEventDialog } from "../../reducers/uiReducer.ts";
 import Icon from "@mdi/react";
 import { mdiPlus } from "@mdi/js";
 
-const Popup = ({
+const AddEventPopup = ({
     popupRef,
     setOpen,
 }: {
@@ -25,7 +25,7 @@ const Popup = ({
     const onClick = useCallback(
         (e: MouseEvent<HTMLButtonElement>) => {
             e.stopPropagation();
-            dispatch(setShowDialog(true));
+            dispatch(setShowAddEventDialog(true));
             setOpen(false);
         },
         [dispatch, setOpen],
@@ -57,4 +57,4 @@ const Popup = ({
     );
 };
 
-export default Popup;
+export default AddEventPopup;

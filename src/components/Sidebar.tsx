@@ -2,11 +2,12 @@ import { useMemo } from "react";
 import Icon from "@mdi/react";
 import { mdiPlus } from "@mdi/js";
 import { useAppDispatch, useAppSelector } from "../hook";
-import { setShowDialog } from "../reducers/uiReducer";
+import { setShowAddEventDialog } from "../reducers/uiReducer";
 import monthNames from "../utils/monthNames";
 import { LunarCalendar } from "@dqcai/vn-lunar";
 
 const Sidebar = () => {
+    const token = useAppSelector((state) => state.user.token);
     const selectedTs = useAppSelector(
         (state) => state.date.currentSelectedSolarDate,
     );
@@ -56,22 +57,32 @@ const Sidebar = () => {
                     {lunarLeap}, {lunarYearCanChi}
                 </p>
 
-                <div className='flex justify-center mt-4'>
-                    <button
-                        onClick={() => dispatch(setShowDialog(true))}
-                        aria-label='Add'
-                        className='px-4 py-2 rounded-md text-white bg-orange-600 hover:bg-orange-700 active:bg-orange-800 font-bold text-lg'>
-                        <Icon path={mdiPlus} size={1} className='inline pb-1' />{" "}
-                        Thêm
-                    </button>
+                {token && (
+                    <div className='flex justify-center mt-4'>
+                        <button
+                            onClick={() =>
+                                dispatch(setShowAddEventDialog(true))
+                            }
+                            aria-label='Add'
+                            className='px-4 py-2 rounded-md text-white bg-orange-600 hover:bg-orange-700 active:bg-orange-800 font-bold text-lg'>
+                            <Icon
+                                path={mdiPlus}
+                                size={1}
+                                className='inline pb-1'
+                            />{" "}
+                            Thêm
+                        </button>
+                    </div>
+                )}
+            </div>
+            {token && (
+                <div className='px-2'>
+                    <p className='font-bold text-lg'>Sự kiện</p>
+                    <p className='mt-2'>
+                        <em>Không có sự kiện</em>
+                    </p>
                 </div>
-            </div>
-            <div className='px-2'>
-                <p className='font-bold text-lg'>Sự kiện</p>
-                <p className='mt-2'>
-                    <em>Không có sự kiện</em>
-                </p>
-            </div>
+            )}
         </div>
     );
 };
