@@ -22,3 +22,14 @@ export const EventSchema = z.object({
 });
 
 export type Event = z.infer<typeof EventSchema>;
+
+export type AuthPayload = {
+    auth: {
+        id: string;
+        name: string;
+        profilePictureLink: string;
+        token: string;
+    };
+};
+
+export type AuthVars = { oauthToken: string };
