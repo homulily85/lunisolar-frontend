@@ -14,7 +14,7 @@ const DayCell = ({
 
     const [open, setOpen] = useState(false);
     const popupRef = useRef<HTMLDivElement>(null);
-    const token = useAppSelector((state) => state.user.token);
+    const token = useAppSelector((state) => state.user.accessToken);
 
     useEffect(() => {
         function handleClickOutside(e: MouseEvent) {

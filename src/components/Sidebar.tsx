@@ -7,7 +7,7 @@ import monthNames from "../utils/monthNames";
 import { LunarCalendar } from "@dqcai/vn-lunar";
 
 const Sidebar = () => {
-    const token = useAppSelector((state) => state.user.token);
+    const accessToken = useAppSelector((state) => state.user.accessToken);
     const selectedTs = useAppSelector(
         (state) => state.date.currentSelectedSolarDate,
     );
@@ -57,7 +57,7 @@ const Sidebar = () => {
                     {lunarLeap}, {lunarYearCanChi}
                 </p>
 
-                {token && (
+                {accessToken && (
                     <div className='flex justify-center mt-4'>
                         <button
                             onClick={() =>
@@ -75,7 +75,7 @@ const Sidebar = () => {
                     </div>
                 )}
             </div>
-            {token && (
+            {accessToken && (
                 <div className='px-2'>
                     <p className='font-bold text-lg'>Sự kiện</p>
                     <p className='mt-2'>

@@ -2,16 +2,16 @@ import { type RefObject, useCallback } from "react";
 import { GoogleLogin, GoogleOAuthProvider } from "@react-oauth/google";
 import { OAUTH_CLIENT_ID } from "../../config.ts";
 import { useApolloClient } from "@apollo/client/react";
-import { AUTH } from "../../graphql/query.ts";
-import { useAppDispatch } from "../../hook.ts";
+import { AUTH, REFRESH_ACCESS_TOKEN } from "../../graphql/query.ts";
+import { toast } from "react-toastify";
+import decodeAccessToken from "../../utils/decodeAccessToken.ts";
 import {
-    setId,
+    setAccessToken,
     setName,
     setProfilePictureLink,
-    setToken,
+    setUserId,
 } from "../../reducers/userReducer.ts";
-import { toast } from "react-toastify";
-import type { AuthPayload, AuthVars } from "../../type.ts";
+import { useAppDispatch } from "../../hook.ts";
 
 const LoginPopup = ({
     popupRef,
@@ -24,25 +24,41 @@ const LoginPopup = ({
     const getUserInfo = useCallback(
         async (credential?: string) => {
             if (!credential) {
-                toast.error("Missing credential!");
+                toast.error("Chứng chỉ không hợp lệ!");
                 return;
             }
 
-            const result = await client.mutate<AuthPayload, AuthVars>({
+            const authResult = await client.mutate<
+                { auth: string },
+                { oauthToken: string }
+            >({
                 mutation: AUTH,
                 variables: { oauthToken: credential },
             });
 
-            if (!result.data?.auth) {
-                toast.error("Chứng chỉ đăng nhập không hợp lệ!");
+            if (authResult.data?.auth !== "success") {
+                toast.error("Chứng chỉ không hợp lệ!");
                 return;
             }
 
-            const { auth } = result.data;
-            dispatch(setName(auth.name));
-            dispatch(setId(auth.id));
-            dispatch(setProfilePictureLink(auth.profilePictureLink ?? ""));
-            dispatch(setToken(auth.token));
+            const getAccessTokenResult = await client.mutate<{
+                refreshAccessToken: string | null;
+            }>({
+                mutation: REFRESH_ACCESS_TOKEN,
+            });
+
+            const accessToken = getAccessTokenResult.data?.refreshAccessToken;
+
+            if (!accessToken) {
+                toast.error("Chứng chỉ không hợp lệ!");
+                return;
+            }
+
+            const payload = decodeAccessToken(accessToken);
+            dispatch(setAccessToken(accessToken));
+            dispatch(setUserId(payload.userId));
+            dispatch(setName(payload.name));
+            dispatch(setProfilePictureLink(payload.profilePictureLink));
         },
         [client, dispatch],
     );
@@ -57,8 +73,8 @@ const LoginPopup = ({
             <div className='flex mt-3 w-full justify-center align-middle'>
                 <GoogleOAuthProvider clientId={OAUTH_CLIENT_ID}>
                     <GoogleLogin
-                        use_fedcm_for_button={true}
-                        use_fedcm_for_prompt={true}
+                        use_fedcm_for_button={false}
+                        use_fedcm_for_prompt={false}
                         onSuccess={async (credentialResponse) => {
                             await getUserInfo(credentialResponse.credential);
                         }}></GoogleLogin>

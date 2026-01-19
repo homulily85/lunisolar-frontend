@@ -12,7 +12,7 @@ const NavBar = () => {
     const [loginDialogOpen, setLoginDialogOpen] = useState(false);
     const popupRef = useRef<HTMLDivElement>(null);
 
-    const token = useAppSelector((s) => s.user.token);
+    const accessToken = useAppSelector((s) => s.user.accessToken);
     const selectedTs = useAppSelector((s) => s.date.currentSelectedSolarDate);
     const todayTs = useAppSelector((s) => s.date.today);
     const dispatch = useAppDispatch();
@@ -76,7 +76,7 @@ const NavBar = () => {
                     Hôm nay
                 </button>
             </div>
-            {!token && (
+            {!accessToken && (
                 <div className='relative'>
                     <button
                         onClick={() => {

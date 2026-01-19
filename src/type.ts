@@ -1,4 +1,5 @@
 import { z } from "zod";
+import type { JwtPayload } from "jwt-decode";
 
 export interface DayInfo {
     date: Date;
@@ -23,13 +24,8 @@ export const EventSchema = z.object({
 
 export type Event = z.infer<typeof EventSchema>;
 
-export type AuthPayload = {
-    auth: {
-        id: string;
-        name: string;
-        profilePictureLink: string;
-        token: string;
-    };
-};
-
-export type AuthVars = { oauthToken: string };
+export interface AccessTokenPayload extends JwtPayload {
+    userId: string;
+    name: string;
+    profilePictureLink?: string;
+}

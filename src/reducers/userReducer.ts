@@ -4,19 +4,19 @@ const userSlice = createSlice({
     name: "user",
     initialState: {
         name: "",
-        id: "",
-        token: "",
+        userId: "",
+        accessToken: "",
         profilePictureLink: "",
     },
     reducers: {
         setName: (state, action) => {
             state.name = action.payload;
         },
-        setId: (state, action) => {
-            state.id = action.payload;
+        setUserId: (state, action) => {
+            state.userId = action.payload;
         },
-        setToken: (state, action) => {
-            state.token = action.payload;
+        setAccessToken: (state, action) => {
+            state.accessToken = action.payload;
         },
         setProfilePictureLink: (state, action) => {
             state.profilePictureLink = action.payload;
@@ -25,5 +25,5 @@ const userSlice = createSlice({
 });
 
 export default userSlice.reducer;
-export const { setId, setName, setProfilePictureLink, setToken } =
+export const { setUserId, setName, setProfilePictureLink, setAccessToken } =
     userSlice.actions;
