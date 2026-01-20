@@ -48,7 +48,7 @@ const AddEventPopup = ({
     return (
         <div
             ref={popupRef}
-            className={`absolute w-max ${flip ? "right-full mr-1" : "left-full ml-1"} bg-white hover:bg-gray-100 dark:bg-gray-500 dark:hover:bg-gray-600 rounded shadow z-50`}>
+            className={`absolute w-max ${flip ? "right-full mr-1" : "left-full ml-1"} bg-white hover:cursor-pointer hover:bg-gray-100 dark:bg-gray-500 dark:hover:bg-gray-600 rounded shadow z-50`}>
             <button className='w-full h-full p-3' onClick={onClick}>
                 <Icon path={mdiPlus} size={1} className='inline pb-1' />
                 Thêm sự kiện

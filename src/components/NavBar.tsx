@@ -5,14 +5,16 @@ import { useAppDispatch, useAppSelector } from "../hook.ts";
 import monthNames from "../utils/monthNames.ts";
 import { setCurrentSelectedSolarDate } from "../reducers/dateReducer.ts";
 import LoginPopup from "./popup/LoginPopup.tsx";
+import SettingPopup from "./popup/SettingPopup.tsx";
 
 const ICON_SIZE = 1.25;
 
 const NavBar = () => {
-    const [loginDialogOpen, setLoginDialogOpen] = useState(false);
+    const [loginPopup, setLoginPopup] = useState(false);
+    const [settingPopup, setSettingPopup] = useState(false);
     const popupRef = useRef<HTMLDivElement>(null);
 
-    const accessToken = useAppSelector((s) => s.user.accessToken);
+    const { accessToken, profilePictureLink } = useAppSelector((s) => s.user);
     const selectedTs = useAppSelector((s) => s.date.currentSelectedSolarDate);
     const todayTs = useAppSelector((s) => s.date.today);
     const dispatch = useAppDispatch();
@@ -41,7 +43,8 @@ const NavBar = () => {
     useEffect(() => {
         function handleClickOutside(e: MouseEvent) {
             if (!popupRef.current?.contains(e.target as Node)) {
-                setLoginDialogOpen(false);
+                setLoginPopup(false);
+                setSettingPopup(false);
             }
         }
 
@@ -55,7 +58,7 @@ const NavBar = () => {
             <div className='flex justify-center items-center gap-2'>
                 <button
                     aria-label='Previous month'
-                    className='hover:bg-gray-100 active:bg-gray-200 dark:hover:bg-gray-700 dark:active:bg-gray-800 rounded-full p-2 flex items-center justify-center'
+                    className='hover:bg-gray-100 active:bg-gray-200 hover:cursor-pointer dark:hover:bg-gray-700 dark:active:bg-gray-800 rounded-full p-2 flex items-center justify-center'
                     onClick={() => changeMonth(-1)}>
                     <Icon path={mdiChevronLeft} size={ICON_SIZE} />
                 </button>
@@ -64,14 +67,14 @@ const NavBar = () => {
 
                 <button
                     aria-label='Next month'
-                    className='hover:bg-gray-100 active:bg-gray-200 dark:hover:bg-gray-700 dark:active:bg-gray-800 rounded-full p-2 flex items-center justify-center'
+                    className='hover:bg-gray-100 active:bg-gray-200  hover:cursor-pointer dark:hover:bg-gray-700 dark:active:bg-gray-800 rounded-full p-2 flex items-center justify-center'
                     onClick={() => changeMonth(1)}>
                     <Icon path={mdiChevronRight} size={ICON_SIZE} />
                 </button>
 
                 <button
                     onClick={jumpToToday}
-                    className='font-bold hover:bg-gray-100 active:bg-gray-200 rounded-xl border py-2 px-8 border-gray-400 dark:hover:bg-gray-700 dark:active:bg-gray-800'
+                    className='font-bold hover:bg-gray-100 hover:cursor-pointer active:bg-gray-200 rounded-xl border py-2 px-8 border-gray-400 dark:hover:bg-gray-700 dark:active:bg-gray-800'
                     aria-label='Jump to today'>
                     Hôm nay
                 </button>
@@ -80,12 +83,32 @@ const NavBar = () => {
                 <div className='relative'>
                     <button
                         onClick={() => {
-                            setLoginDialogOpen(true);
+                            setLoginPopup(true);
                         }}
-                        className={`bg-orange-600 hover:bg-orange-700 active:bg-orange-800 rounded-lg flex items-center justify-center px-4 py-2 text-white font-bold`}>
+                        className={`bg-orange-600 hover:cursor-pointer hover:bg-orange-700 active:bg-orange-800 rounded-lg flex items-center justify-center px-4 py-2 text-white font-bold`}>
                         Đăng nhập
                     </button>
-                    {loginDialogOpen && <LoginPopup popupRef={popupRef} />}
+                    {loginPopup && <LoginPopup popupRef={popupRef} />}
+                </div>
+            )}
+
+            {accessToken && (
+                <div className='relative'>
+                    <div className='relative'>
+                        <button
+                            className='hover:cursor-pointer'
+                            onClick={() => {
+                                setSettingPopup(true);
+                            }}>
+                            <img
+                                src={profilePictureLink}
+                                alt="user's profile picture"
+                                width={48}
+                                className='rounded-full'
+                            />
+                        </button>
+                    </div>
+                    {settingPopup && <SettingPopup popupRef={popupRef} />}
                 </div>
             )}
         </div>

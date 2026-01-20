@@ -1,22 +1,23 @@
-import Calendar from "./components/calendar/Calendar.tsx";
-import Sidebar from "./components/Sidebar.tsx";
-import NavBar from "./components/NavBar.tsx";
-import AddNewEvent from "./components/newEvent/AddNewEvent.tsx";
+import Calendar from "./components/calendar/Calendar";
+import Sidebar from "./components/Sidebar";
+import NavBar from "./components/NavBar";
+import AddNewEvent from "./components/newEvent/AddNewEvent";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useEffect, useState } from "react";
 import { useApolloClient } from "@apollo/client/react";
-import { REFRESH_ACCESS_TOKEN } from "./graphql/query.ts";
-import decodeAccessToken from "./utils/decodeAccessToken.ts";
+import { REFRESH_ACCESS_TOKEN } from "./graphql/query";
+import decodeAccessToken from "./utils/decodeAccessToken";
 import {
     setAccessToken,
     setName,
     setProfilePictureLink,
     setUserId,
-} from "./reducers/userReducer.ts";
-import { useAppDispatch } from "./hook.ts";
+} from "./reducers/userReducer";
+import { useAppDispatch } from "./hook";
+import { CombinedGraphQLErrors } from "@apollo/client";
 
-function App() {
+const App = () => {
     const [theme, setTheme] = useState<"light" | "dark">(() =>
         window.matchMedia("(prefers-color-scheme: dark)").matches
             ? "dark"
@@ -27,34 +28,44 @@ function App() {
 
     useEffect(() => {
         const media = window.matchMedia("(prefers-color-scheme: dark)");
-
-        const handler = (e: MediaQueryListEvent) => {
+        const handler = (e: MediaQueryListEvent) =>
             setTheme(e.matches ? "dark" : "light");
-        };
-
         media.addEventListener("change", handler);
 
-        client
-            .mutate<{
-                refreshAccessToken: string | null;
-            }>({
-                mutation: REFRESH_ACCESS_TOKEN,
-            })
-            .then((getAccessTokenResult) => {
-                const accessToken =
-                    getAccessTokenResult.data?.refreshAccessToken;
+        (async () => {
+            try {
+                const result = await client.mutate<{
+                    refreshAccessToken: string | null;
+                }>({
+                    mutation: REFRESH_ACCESS_TOKEN,
+                });
+
+                const accessToken = result.data?.refreshAccessToken;
 
                 if (!accessToken) {
                     console.log("invalid credentials");
                     return;
                 }
 
-                const payload = decodeAccessToken(accessToken);
+                const payload = decodeAccessToken(accessToken) as {
+                    userId: string;
+                    name: string;
+                    profilePictureLink?: string | null;
+                };
+
                 dispatch(setAccessToken(accessToken));
                 dispatch(setUserId(payload.userId));
                 dispatch(setName(payload.name));
-                dispatch(setProfilePictureLink(payload.profilePictureLink));
-            });
+                if (payload.profilePictureLink) {
+                    dispatch(setProfilePictureLink(payload.profilePictureLink));
+                }
+            } catch (e) {
+                if (e instanceof CombinedGraphQLErrors) {
+                    return;
+                }
+                console.error(e);
+            }
+        })();
 
         return () => {
             media.removeEventListener("change", handler);
@@ -83,6 +94,6 @@ function App() {
             />
         </div>
     );
-}
+};
 
 export default App;

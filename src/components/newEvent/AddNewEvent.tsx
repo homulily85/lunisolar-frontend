@@ -188,7 +188,7 @@ const AddNewEvent = () => {
                 <DialogPanel className='space-y-4 bg-white px-8 py-6 rounded-xl w-xl dark:bg-gray-800'>
                     <div className='grid grid-cols-[auto_1fr_auto]'>
                         <button
-                            className='py-2 px-4 bg-gray-200 rounded-lg hover:bg-gray-300 font-bold dark:bg-gray-600 dark:hover:bg-gray-700'
+                            className='py-2 px-4 bg-gray-200 rounded-lg hover:cursor-pointer hover:bg-gray-300 font-bold dark:bg-gray-600 dark:hover:bg-gray-700'
                             onClick={closeDialog}>
                             Hủy
                         </button>
@@ -196,7 +196,7 @@ const AddNewEvent = () => {
                             Sự kiện mới
                         </DialogTitle>
                         <button
-                            className='py-2 px-4 bg-orange-200 rounded-lg hover:bg-orange-300 font-bold dark:bg-orange-700 dark:hover:bg-orange-800'
+                            className='py-2 px-4 bg-orange-200 rounded-lg  hover:cursor-pointerhover:bg-orange-300 font-bold dark:bg-orange-700 dark:hover:bg-orange-800'
                             onClick={() => {
                                 saveNewEvent();
                             }}>
@@ -395,7 +395,7 @@ const AddNewEvent = () => {
                                     <button
                                         type='button'
                                         onClick={addReminder}
-                                        className='col-span-2 justify-self-center flex items-center gap-2 justify-center hover:bg-gray-200 py-2 w-max rounded-md px-2 dark:hover:bg-gray-700'>
+                                        className='col-span-2 justify-self-center flex items-center gap-2 justify-center hover:cursor-pointer hover:bg-gray-200 py-2 w-max rounded-md px-2 dark:hover:bg-gray-700'>
                                         <Icon
                                             className='inline-block'
                                             path={mdiPlus}

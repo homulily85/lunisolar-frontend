@@ -64,7 +64,7 @@ const Sidebar = () => {
                                 dispatch(setShowAddEventDialog(true))
                             }
                             aria-label='Add'
-                            className='px-4 py-2 rounded-md text-white bg-orange-600 hover:bg-orange-700 active:bg-orange-800 font-bold text-lg'>
+                            className='px-4 py-2 rounded-md text-white bg-orange-600 hover:cursor-pointer hover:bg-orange-700 active:bg-orange-800 font-bold text-lg'>
                             <Icon
                                 path={mdiPlus}
                                 size={1}

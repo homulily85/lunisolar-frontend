@@ -27,5 +27,5 @@ export type Event = z.infer<typeof EventSchema>;
 export interface AccessTokenPayload extends JwtPayload {
     userId: string;
     name: string;
-    profilePictureLink?: string;
+    profilePictureLink: string;
 }
