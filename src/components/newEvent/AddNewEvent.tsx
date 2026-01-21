@@ -21,6 +21,8 @@ import { z } from "zod";
 import type { Option } from "../../type.ts";
 import reminderTime from "../../utils/reminderTime.ts";
 import frequency from "../../utils/frequency.ts";
+import { addNewEvent } from "../../services/eventService.ts";
+import createRruleString from "../../utils/createRruleString.ts";
 
 const EMPTY_REMINDER: Option = {
     key: "",
@@ -107,7 +109,7 @@ const AddNewEvent = () => {
         setSelectedEndDate(new Date(selectedTs));
     }, [selectedTs]);
 
-    const saveNewEvent = () => {
+    const saveNewEvent = async () => {
         if (title.trim() === "") {
             toast.error("Trường tiêu đề không được trống!");
             return;
@@ -139,8 +141,9 @@ const AddNewEvent = () => {
             ...endTimeParsed.data.split(":").map(Number),
         );
 
-        if (!(startDateTime <= endDateTime)) {
+        if (startDateTime > endDateTime) {
             toast.error("Thời điểm kết thúc phải lớn hơn thời điểm bắt đầu!");
+            return;
         }
 
         for (const reminder of selectedReminders) {
@@ -150,7 +153,34 @@ const AddNewEvent = () => {
             }
         }
 
-        closeDialog();
+        try {
+            const createNewEventResult = await addNewEvent({
+                title: title.trim(),
+                isAllDay: isAllDay,
+                startDateTime: startDateTime.toISOString(),
+                endDateTime: endDateTime.toISOString(),
+                description: description,
+                reminder: selectedReminders
+                    .filter((r) => r !== null)
+                    .map((r) => r.key),
+                rruleString: createRruleString(
+                    selectedRepeat.key,
+                    startDateTime,
+                ),
+            });
+
+            if (!createNewEventResult.data?.addEvent.id) {
+                toast.error("Có lỗi xảy ra khi tạo sự kiện mới");
+                return;
+            } else {
+                console.log(createNewEventResult.data.addEvent.id);
+                closeDialog();
+            }
+        } catch (e) {
+            toast.error("Có lỗi xảy ra khi tạo sự kiện mới");
+            console.log(e);
+            return;
+        }
     };
 
     return (
