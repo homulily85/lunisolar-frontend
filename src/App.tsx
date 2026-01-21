@@ -5,8 +5,6 @@ import AddNewEvent from "./components/newEvent/AddNewEvent";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useEffect, useState } from "react";
-import { useApolloClient } from "@apollo/client/react";
-import { REFRESH_ACCESS_TOKEN } from "./graphql/query";
 import decodeAccessToken from "./utils/decodeAccessToken";
 import {
     setAccessToken,
@@ -16,6 +14,7 @@ import {
 } from "./reducers/userReducer";
 import { useAppDispatch } from "./hook";
 import { CombinedGraphQLErrors } from "@apollo/client";
+import { getAccessToken } from "./services/authenticationService.ts";
 
 const App = () => {
     const [theme, setTheme] = useState<"light" | "dark">(() =>
@@ -23,7 +22,6 @@ const App = () => {
             ? "dark"
             : "light",
     );
-    const client = useApolloClient();
     const dispatch = useAppDispatch();
 
     useEffect(() => {
@@ -34,31 +32,19 @@ const App = () => {
 
         (async () => {
             try {
-                const result = await client.mutate<{
-                    refreshAccessToken: string | null;
-                }>({
-                    mutation: REFRESH_ACCESS_TOKEN,
-                });
-
-                const accessToken = result.data?.refreshAccessToken;
+                const accessToken = await getAccessToken();
 
                 if (!accessToken) {
                     console.log("invalid credentials");
                     return;
                 }
 
-                const payload = decodeAccessToken(accessToken) as {
-                    userId: string;
-                    name: string;
-                    profilePictureLink?: string | null;
-                };
+                const payload = decodeAccessToken(accessToken);
 
                 dispatch(setAccessToken(accessToken));
                 dispatch(setUserId(payload.userId));
                 dispatch(setName(payload.name));
-                if (payload.profilePictureLink) {
-                    dispatch(setProfilePictureLink(payload.profilePictureLink));
-                }
+                dispatch(setProfilePictureLink(payload.profilePictureLink));
             } catch (e) {
                 if (e instanceof CombinedGraphQLErrors) {
                     return;
@@ -70,7 +56,7 @@ const App = () => {
         return () => {
             media.removeEventListener("change", handler);
         };
-    }, [client, dispatch]);
+    }, [dispatch]);
 
     return (
         <div

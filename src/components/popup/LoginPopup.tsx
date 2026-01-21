@@ -1,8 +1,6 @@
 import { type RefObject, useCallback, useState } from "react";
 import { GoogleLogin, GoogleOAuthProvider } from "@react-oauth/google";
 import { OAUTH_CLIENT_ID } from "../../config.ts";
-import { useApolloClient } from "@apollo/client/react";
-import { AUTH, REFRESH_ACCESS_TOKEN } from "../../graphql/query.ts";
 import { toast } from "react-toastify";
 import decodeAccessToken from "../../utils/decodeAccessToken.ts";
 import {
@@ -12,6 +10,7 @@ import {
     setUserId,
 } from "../../reducers/userReducer.ts";
 import { useAppDispatch } from "../../hook.ts";
+import { auth, getAccessToken } from "../../services/authenticationService.ts";
 
 const INVALID_MSG = "Chứng chỉ không hợp lệ!";
 
@@ -20,7 +19,6 @@ const LoginPopup = ({
 }: {
     popupRef: RefObject<HTMLDivElement | null>;
 }) => {
-    const client = useApolloClient();
     const dispatch = useAppDispatch();
     const [loading, setLoading] = useState(false);
 
@@ -38,28 +36,12 @@ const LoginPopup = ({
 
             setLoading(true);
             try {
-                const authResult = await client.mutate<
-                    { auth: string },
-                    { oauthToken: string }
-                >({
-                    mutation: AUTH,
-                    variables: { oauthToken: credential },
-                });
-
-                if (authResult.data?.auth !== "success") {
+                if (!(await auth(credential))) {
                     showInvalid();
                     return;
                 }
 
-                const getAccessTokenResult = await client.mutate<{
-                    refreshAccessToken: string | null;
-                }>({
-                    mutation: REFRESH_ACCESS_TOKEN,
-                });
-
-                const accessToken =
-                    getAccessTokenResult.data?.refreshAccessToken;
-
+                const accessToken = await getAccessToken();
                 if (!accessToken) {
                     showInvalid();
                     return;
@@ -77,7 +59,7 @@ const LoginPopup = ({
                 setLoading(false);
             }
         },
-        [client, dispatch, loading, showInvalid],
+        [dispatch, loading, showInvalid],
     );
 
     const handleSuccess = useCallback(

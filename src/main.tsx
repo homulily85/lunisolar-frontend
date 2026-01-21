@@ -4,16 +4,8 @@ import "./css/index.css";
 import App from "./App.tsx";
 import { Provider } from "react-redux";
 import store from "./store.ts";
-import { ApolloClient, HttpLink, InMemoryCache } from "@apollo/client";
 import { ApolloProvider } from "@apollo/client/react";
-
-const client = new ApolloClient({
-    link: new HttpLink({
-        uri: `/api/graphql`,
-        credentials: "same-origin",
-    }),
-    cache: new InMemoryCache(),
-});
+import client from "./graphql/client.ts";
 
 createRoot(document.getElementById("root")!).render(
     <StrictMode>

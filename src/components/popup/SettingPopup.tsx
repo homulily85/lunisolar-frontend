@@ -8,8 +8,7 @@ import {
     setProfilePictureLink,
     setUserId,
 } from "../../reducers/userReducer.ts";
-import { useApolloClient } from "@apollo/client/react";
-import { LOGOUT } from "../../graphql/query.ts";
+import { logout } from "../../services/authenticationService.ts";
 
 const SettingPopup = ({
     popupRef,
@@ -18,16 +17,13 @@ const SettingPopup = ({
 }) => {
     const { name, profilePictureLink } = useAppSelector((s) => s.user);
     const dispatch = useAppDispatch();
-    const client = useApolloClient();
-    const logout = useCallback(async () => {
+    const handleLogout = useCallback(async () => {
         dispatch(setAccessToken(""));
         dispatch(setName(""));
         dispatch(setUserId(""));
         dispatch(setProfilePictureLink(""));
-        await client.mutate({
-            mutation: LOGOUT,
-        });
-    }, [client, dispatch]);
+        await logout();
+    }, [dispatch]);
 
     return (
         <div
@@ -46,7 +42,7 @@ const SettingPopup = ({
             <p className='font-bold mt-2 text-xl'>Xin chào {name}!</p>
             <div className='flex mt-2 w-full justify-center'>
                 <button
-                    onClick={logout}
+                    onClick={handleLogout}
                     className='w-full font-bold hover:bg-gray-100 hover:cursor-pointer active:bg-gray-200 rounded-xl border py-2 px-8 border-gray-400 dark:hover:bg-gray-800 dark:active:bg-gray-900'>
                     <Icon path={mdiLogout} size={1} className='inline mr-2' />
                     Đăng xuất

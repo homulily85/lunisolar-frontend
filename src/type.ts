@@ -29,3 +29,5 @@ export interface AccessTokenPayload extends JwtPayload {
     name: string;
     profilePictureLink: string;
 }
+
+export type Option = { key: string; value: string };
