@@ -25,7 +25,7 @@ export const EventSchema = z.object({
 export type Event = z.infer<typeof EventSchema>;
 
 export interface AccessTokenPayload extends JwtPayload {
-    userId: string;
+    id: string;
     name: string;
     profilePictureLink: string;
 }

@@ -4,7 +4,7 @@ const userSlice = createSlice({
     name: "user",
     initialState: {
         name: "",
-        userId: "",
+        id: "",
         accessToken: "",
         profilePictureLink: "",
     },
@@ -12,8 +12,8 @@ const userSlice = createSlice({
         setName: (state, action) => {
             state.name = action.payload;
         },
-        setUserId: (state, action) => {
-            state.userId = action.payload;
+        setId: (state, action) => {
+            state.id = action.payload;
         },
         setAccessToken: (state, action) => {
             state.accessToken = action.payload;
@@ -25,5 +25,5 @@ const userSlice = createSlice({
 });
 
 export default userSlice.reducer;
-export const { setUserId, setName, setProfilePictureLink, setAccessToken } =
+export const { setId, setName, setProfilePictureLink, setAccessToken } =
     userSlice.actions;

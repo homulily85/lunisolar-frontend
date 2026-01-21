@@ -4,9 +4,9 @@ import { mdiLogout } from "@mdi/js";
 import Icon from "@mdi/react";
 import {
     setAccessToken,
+    setId,
     setName,
     setProfilePictureLink,
-    setUserId,
 } from "../../reducers/userReducer.ts";
 import { logout } from "../../services/authenticationService.ts";
 
@@ -20,7 +20,7 @@ const SettingPopup = ({
     const handleLogout = useCallback(async () => {
         dispatch(setAccessToken(""));
         dispatch(setName(""));
-        dispatch(setUserId(""));
+        dispatch(setId(""));
         dispatch(setProfilePictureLink(""));
         await logout();
     }, [dispatch]);

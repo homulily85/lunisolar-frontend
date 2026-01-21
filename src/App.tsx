@@ -8,9 +8,9 @@ import { useEffect, useState } from "react";
 import decodeAccessToken from "./utils/decodeAccessToken";
 import {
     setAccessToken,
+    setId,
     setName,
     setProfilePictureLink,
-    setUserId,
 } from "./reducers/userReducer";
 import { useAppDispatch } from "./hook";
 import { CombinedGraphQLErrors } from "@apollo/client";
@@ -42,7 +42,7 @@ const App = () => {
                 const payload = decodeAccessToken(accessToken);
 
                 dispatch(setAccessToken(accessToken));
-                dispatch(setUserId(payload.userId));
+                dispatch(setId(payload.id));
                 dispatch(setName(payload.name));
                 dispatch(setProfilePictureLink(payload.profilePictureLink));
             } catch (e) {

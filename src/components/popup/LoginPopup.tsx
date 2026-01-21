@@ -5,9 +5,9 @@ import { toast } from "react-toastify";
 import decodeAccessToken from "../../utils/decodeAccessToken.ts";
 import {
     setAccessToken,
+    setId,
     setName,
     setProfilePictureLink,
-    setUserId,
 } from "../../reducers/userReducer.ts";
 import { useAppDispatch } from "../../hook.ts";
 import { auth, getAccessToken } from "../../services/authenticationService.ts";
@@ -49,7 +49,7 @@ const LoginPopup = ({
 
                 const payload = decodeAccessToken(accessToken);
                 dispatch(setAccessToken(accessToken));
-                dispatch(setUserId(payload.userId));
+                dispatch(setId(payload.id));
                 dispatch(setName(payload.name));
                 dispatch(setProfilePictureLink(payload.profilePictureLink));
             } catch (e) {
