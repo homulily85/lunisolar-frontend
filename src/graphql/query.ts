@@ -25,3 +25,19 @@ export const ADD_EVENT = gql`
         }
     }
 `;
+
+export const GET_EVENT = gql`
+    query ($rangeStart: String!, $rangeEnd: String!) {
+        getEvents(rangeStart: $rangeStart, rangeEnd: $rangeEnd) {
+            id
+            title
+            place
+            isAllDay
+            startDateTime
+            endDateTime
+            rruleString
+            description
+            reminder
+        }
+    }
+`;

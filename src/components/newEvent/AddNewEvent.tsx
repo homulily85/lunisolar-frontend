@@ -154,7 +154,7 @@ const AddNewEvent = () => {
         }
 
         try {
-            const createNewEventResult = await addNewEvent({
+            const eventId = await addNewEvent({
                 title: title.trim(),
                 isAllDay: isAllDay,
                 startDateTime: startDateTime.toISOString(),
@@ -169,13 +169,8 @@ const AddNewEvent = () => {
                 ),
             });
 
-            if (!createNewEventResult.data?.addEvent.id) {
-                toast.error("Có lỗi xảy ra khi tạo sự kiện mới");
-                return;
-            } else {
-                console.log(createNewEventResult.data.addEvent.id);
-                closeDialog();
-            }
+            console.log(eventId);
+            closeDialog();
         } catch (e) {
             toast.error("Có lỗi xảy ra khi tạo sự kiện mới");
             console.log(e);

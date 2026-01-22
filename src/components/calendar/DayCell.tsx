@@ -1,7 +1,10 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { DayInfo } from "../../type.ts";
 import AddEventPopup from "../popup/AddEventPopup.tsx";
 import { useAppSelector } from "../../hook.ts";
+import Icon from "@mdi/react";
+import { mdiCircleSmall } from "@mdi/js";
+import findAllEventsInADay from "../../utils/findAllEventsInADay.ts";
 
 const DayCell = ({
     info,
@@ -15,6 +18,15 @@ const DayCell = ({
     const [open, setOpen] = useState(false);
     const popupRef = useRef<HTMLDivElement>(null);
     const token = useAppSelector((state) => state.user.accessToken);
+    const events = useAppSelector((state) => state.events);
+
+    const eventsInCurrentDay = useMemo(() => {
+        if (!token) {
+            return [];
+        } else {
+            return findAllEventsInADay(events, date);
+        }
+    }, [date, events, token]);
 
     useEffect(() => {
         function handleClickOutside(e: MouseEvent) {
@@ -22,7 +34,6 @@ const DayCell = ({
                 setOpen(false);
             }
         }
-
         document.addEventListener("mousedown", handleClickOutside);
         return () =>
             document.removeEventListener("mousedown", handleClickOutside);
@@ -51,6 +62,9 @@ const DayCell = ({
                         ${isSelected ? "" : " hover:bg-gray-100 dark:hover:bg-gray-600"}`}>
             <p className={`text-lg ${textColor}`}>{date.getDate()}</p>
             <p className={`text-sm ${textColor}`}>{lunarText}</p>
+            {eventsInCurrentDay.length > 0 && (
+                <Icon path={mdiCircleSmall} size={1} />
+            )}
             {open && token && (
                 <AddEventPopup popupRef={popupRef} setOpen={setOpen} />
             )}

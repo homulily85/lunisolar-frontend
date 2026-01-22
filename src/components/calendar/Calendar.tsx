@@ -1,9 +1,12 @@
-import { useCallback, useMemo, type WheelEvent } from "react";
+import { useCallback, useEffect, useMemo, type WheelEvent } from "react";
 import { useAppDispatch, useAppSelector } from "../../hook.ts";
 import { LunarCalendar } from "@dqcai/vn-lunar";
 import { setCurrentSelectedSolarDate } from "../../reducers/dateReducer.ts";
 import type { DayInfo } from "../../type.ts";
 import DayCell from "./DayCell.tsx";
+import { getEvents } from "../../services/eventService.ts";
+import { toast } from "react-toastify";
+import { setEvents } from "../../reducers/eventsReducer.ts";
 
 const WEEK_DAYS = [
     "Chủ Nhật",
@@ -24,6 +27,7 @@ const isSameDate = (a: Date, b: Date) =>
 const Calendar = () => {
     const todayTs = useAppSelector((s) => s.date.today);
     const selectedTs = useAppSelector((s) => s.date.currentSelectedSolarDate);
+    const accessToken = useAppSelector((s) => s.user.accessToken);
     const dispatch = useAppDispatch();
 
     const today = useMemo(() => new Date(todayTs), [todayTs]);
@@ -94,6 +98,28 @@ const Calendar = () => {
         },
         [changeMonth],
     );
+
+    useEffect(() => {
+        if (!accessToken) {
+            return;
+        }
+        (async () => {
+            try {
+                const events = await getEvents(
+                    firstDayOfSelectedMonth,
+                    new Date(
+                        firstDayOfSelectedMonth.getFullYear(),
+                        firstDayOfSelectedMonth.getMonth() + 1,
+                        0,
+                    ),
+                );
+                dispatch(setEvents(events));
+            } catch (e) {
+                console.log(e);
+                toast.error("Có lỗi xảy ra!");
+            }
+        })();
+    }, [accessToken, dispatch, firstDayOfSelectedMonth]);
 
     return (
         <div

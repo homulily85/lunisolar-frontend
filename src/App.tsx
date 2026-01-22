@@ -4,7 +4,7 @@ import NavBar from "./components/NavBar";
 import AddNewEvent from "./components/newEvent/AddNewEvent";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import decodeAccessToken from "./utils/decodeAccessToken";
 import {
     setAccessToken,
@@ -23,13 +23,21 @@ const App = () => {
             : "light",
     );
     const dispatch = useAppDispatch();
+    const ranRef = useRef(false);
 
     useEffect(() => {
         const media = window.matchMedia("(prefers-color-scheme: dark)");
         const handler = (e: MediaQueryListEvent) =>
             setTheme(e.matches ? "dark" : "light");
         media.addEventListener("change", handler);
+        return () => {
+            media.removeEventListener("change", handler);
+        };
+    }, [dispatch]);
 
+    useEffect(() => {
+        if (ranRef.current) return;
+        ranRef.current = true;
         (async () => {
             try {
                 const accessToken = await getAccessToken();
@@ -52,10 +60,6 @@ const App = () => {
                 console.error(e);
             }
         })();
-
-        return () => {
-            media.removeEventListener("change", handler);
-        };
     }, [dispatch]);
 
     return (
