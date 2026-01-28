@@ -1,11 +1,11 @@
 import client from "../graphql/client.ts";
-import { type Event } from "../type.ts";
+import { type EventFromClient, type EventFromServer } from "../type.ts";
 import { ADD_EVENT, GET_EVENTS } from "../graphql/query.ts";
 
-export const addNewEvent = async (event: Event) => {
+export const addNewEvent = async (event: EventFromClient) => {
     const result = await client.mutate<
-        { addEvent: Event },
-        { newEvent: Event }
+        { addEvent: EventFromServer },
+        { newEvent: EventFromClient }
     >({
         mutation: ADD_EVENT,
         variables: { newEvent: event },
@@ -27,7 +27,7 @@ export const addNewEvent = async (event: Event) => {
                     15,
                 );
 
-                cache.updateQuery<{ getEvents: Event[] }>(
+                cache.updateQuery<{ getEvents: EventFromServer[] }>(
                     {
                         query: GET_EVENTS,
                         variables: {
@@ -60,7 +60,7 @@ export const addNewEvent = async (event: Event) => {
 
 export const getEvents = async (startRange: Date, endRange: Date) => {
     const result = await client.query<
-        { getEvents: Event[] },
+        { getEvents: EventFromServer[] },
         {
             rangeStart: string;
             rangeEnd: string;

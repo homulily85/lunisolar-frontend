@@ -1,24 +1,33 @@
-import { type Event } from "../type.ts";
+import { type EventFromServer } from "../type.ts";
 
-export const isThisEventFinishedAfter = (event: Event, datetime: Date) => {
-    return Number(event.endDateTime) > datetime.getTime();
+export const isThisEventFinishedAfter = (
+    event: EventFromServer,
+    datetime: Date,
+) => {
+    return event.endDateTime > datetime.getTime();
 };
 
-export const isThisEventFinishedBefore = (event: Event, datetime: Date) => {
-    return Number(event.endDateTime) < datetime.getTime();
+export const isThisEventFinishedBefore = (
+    event: EventFromServer,
+    datetime: Date,
+) => {
+    return event.endDateTime < datetime.getTime();
 };
 
-export const isThisEventStartBefore = (event: Event, datetime: Date) => {
-    return Number(event.startDateTime) < datetime.getTime();
+export const isThisEventStartBefore = (
+    event: EventFromServer,
+    datetime: Date,
+) => {
+    return event.startDateTime < datetime.getTime();
 };
 
 export const isThisEventStartInTimeRange = (
-    event: Event,
+    event: EventFromServer,
     rangeStart: Date,
     rangeEnd: Date,
 ) => {
     return (
-        Number(event.startDateTime) >= rangeStart.getTime() &&
-        Number(event.startDateTime) <= rangeEnd.getTime()
+        event.startDateTime >= rangeStart.getTime() &&
+        event.startDateTime <= rangeEnd.getTime()
     );
 };

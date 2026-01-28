@@ -1,14 +1,14 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
-import { type Event } from "../type.ts";
+import { type EventFromServer } from "../type.ts";
 
 const eventSlice = createSlice({
     name: "events",
-    initialState: [] as Event[],
+    initialState: [] as EventFromServer[],
     reducers: {
-        setEvents: (state, action: PayloadAction<Event[]>) => {
+        setEvents: (state, action: PayloadAction<EventFromServer[]>) => {
             state.splice(0, state.length, ...action.payload);
         },
-        addEvent: (state, action: PayloadAction<Event>) => {
+        addEvent: (state, action: PayloadAction<EventFromServer>) => {
             state.push(action.payload);
         },
     },

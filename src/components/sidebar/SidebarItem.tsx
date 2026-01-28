@@ -1,9 +1,9 @@
-import { type Event } from "../../type.ts";
+import { type EventFromServer } from "../../type.ts";
 
 import { formatDateTime } from "../../utils/misc.ts";
 
-const SidebarItem = ({ e }: { e: Event }) => {
-    const label = `${e.title}\n${formatDateTime(new Date(Number(e.startDateTime)))} - ${formatDateTime(new Date(Number(e.endDateTime)))}`;
+const SidebarItem = ({ e }: { e: EventFromServer }) => {
+    const label = `${e.title}\n${formatDateTime(new Date(e.startDateTime))} - ${formatDateTime(new Date(e.endDateTime))}`;
     return (
         <div
             aria-label={e.title}

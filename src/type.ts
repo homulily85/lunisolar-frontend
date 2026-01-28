@@ -12,7 +12,6 @@ export interface DayInfo {
 }
 
 export const EventSchema = z.object({
-    id: z.string().optional(),
     title: z.string(),
     place: z.string().optional(),
     isAllDay: z.boolean(),
@@ -23,7 +22,19 @@ export const EventSchema = z.object({
     reminder: z.array(z.string()).optional(),
 });
 
-export type Event = z.infer<typeof EventSchema>;
+export type EventFromClient = z.infer<typeof EventSchema>;
+
+export interface EventFromServer {
+    id: string;
+    title: string;
+    place?: string;
+    isAllDay: boolean;
+    startDateTime: number;
+    endDateTime: number;
+    rruleString: string;
+    description: string;
+    reminder?: string[];
+}
 
 export interface AccessTokenPayload extends JwtPayload {
     id: string;

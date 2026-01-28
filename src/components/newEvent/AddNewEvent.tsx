@@ -173,6 +173,7 @@ const AddNewEvent = () => {
         try {
             const eventId = await addNewEvent({
                 title: title.trim(),
+                place: location,
                 isAllDay: isAllDay,
                 startDateTime: startDateTime.toISOString(),
                 endDateTime: endDateTime.toISOString(),
@@ -189,10 +190,11 @@ const AddNewEvent = () => {
             dispatch(
                 addEvent({
                     id: eventId,
+                    place: location,
                     title: title.trim(),
                     isAllDay: isAllDay,
-                    startDateTime: String(startDateTime.getTime()),
-                    endDateTime: String(endDateTime.getTime()),
+                    startDateTime: startDateTime.getTime(),
+                    endDateTime: endDateTime.getTime(),
                     description: description,
                     reminder: selectedReminders
                         .filter((r) => r !== null)

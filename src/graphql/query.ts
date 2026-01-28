@@ -19,7 +19,7 @@ export const LOGOUT = gql`
 `;
 
 export const ADD_EVENT = gql`
-    mutation ($newEvent: EventInput!) {
+    mutation ($newEvent: EventFromClient!) {
         addEvent(newEvent: $newEvent) {
             id
             title
