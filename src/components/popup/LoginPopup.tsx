@@ -2,7 +2,6 @@ import { type RefObject, useCallback, useState } from "react";
 import { GoogleLogin, GoogleOAuthProvider } from "@react-oauth/google";
 import { OAUTH_CLIENT_ID } from "../../config.ts";
 import { toast } from "react-toastify";
-import decodeAccessToken from "../../utils/decodeAccessToken.ts";
 import {
     setAccessToken,
     setId,
@@ -11,6 +10,7 @@ import {
 } from "../../reducers/userReducer.ts";
 import { useAppDispatch } from "../../hook.ts";
 import { auth, getAccessToken } from "../../services/authenticationService.ts";
+import { decodeAccessToken } from "../../utils/misc.ts";
 
 const INVALID_MSG = "Chứng chỉ không hợp lệ!";
 

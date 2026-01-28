@@ -1,12 +1,12 @@
 import { useMemo } from "react";
 import Icon from "@mdi/react";
 import { mdiPlus } from "@mdi/js";
-import { useAppDispatch, useAppSelector } from "../hook";
-import { setShowAddEventDialog } from "../reducers/uiReducer";
-import monthNames from "../utils/monthNames";
+import { useAppDispatch, useAppSelector } from "../../hook.ts";
+import { setShowAddEventDialog } from "../../reducers/uiReducer.ts";
 import { LunarCalendar } from "@dqcai/vn-lunar";
-import findAllEventsInADay from "../utils/findAllEventsInADay.ts";
-import formatDateTime from "../utils/formatDatetime.ts";
+import EventToday from "./EventToday.tsx";
+import EventOtherDay from "./EventOtherDay.tsx";
+import { isSameDate, monthNames } from "../../utils/misc.ts";
 
 const Sidebar = () => {
     const accessToken = useAppSelector((state) => state.user.accessToken);
@@ -18,21 +18,7 @@ const Sidebar = () => {
         () => new Date(selectedTs),
         [selectedTs],
     );
-    const events = useAppSelector((state) => state.events);
-
-    const eventsInCurrentDay = useMemo(() => {
-        if (!accessToken) {
-            return [];
-        } else {
-            return findAllEventsInADay(events, currentSelectedSolarDate).sort(
-                (e1, e2) => {
-                    if (e1.isAllDay && !e2.isAllDay) return 1;
-                    if (!e1.isAllDay && e2.isAllDay) return -1;
-                    return Number(e1.startDateTime) - Number(e2.startDateTime);
-                },
-            );
-        }
-    }, [currentSelectedSolarDate, events, accessToken]);
+    // const events = useAppSelector((state) => state.events);
 
     const selectedLunarDate = useMemo(() => {
         const d = currentSelectedSolarDate;
@@ -94,42 +80,11 @@ const Sidebar = () => {
             </div>
             <div className='px-2'>
                 <p className='font-bold text-lg'>Sự kiện</p>
-                {eventsInCurrentDay.length > 0 ? (
-                    eventsInCurrentDay.map((e) => {
-                        const start = new Date(Number(e.startDateTime));
-                        const end = new Date(Number(e.endDateTime));
-                        const label = e.isAllDay
-                            ? `${e.title}\n${start.toLocaleDateString("en-GB", {
-                                  day: "2-digit",
-                                  month: "2-digit",
-                                  year: "numeric",
-                              })}`
-                            : `${e.title}\n${formatDateTime(start)} - ${formatDateTime(end)}`;
-                        return (
-                            <div
-                                aria-label={e.title}
-                                title={label}
-                                id={e.id}
-                                className='mt-2 grid grid-cols-[3fr_1fr]'>
-                                <p className='truncate max-w-48'>{e.title}</p>
-                                {e.isAllDay ? (
-                                    <p>Cả ngày</p>
-                                ) : (
-                                    <p>
-                                        {start.toLocaleTimeString(undefined, {
-                                            hour: "2-digit",
-                                            minute: "2-digit",
-                                            hour12: false,
-                                        })}
-                                    </p>
-                                )}
-                            </div>
-                        );
-                    })
+                {accessToken &&
+                isSameDate(new Date(), currentSelectedSolarDate) ? (
+                    <EventToday />
                 ) : (
-                    <p className='mt-2'>
-                        <em>Không có sự kiện</em>
-                    </p>
+                    <EventOtherDay date={currentSelectedSolarDate} />
                 )}
             </div>
         </div>

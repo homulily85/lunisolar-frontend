@@ -19,10 +19,13 @@ import Icon from "@mdi/react";
 import { toast } from "react-toastify";
 import { z } from "zod";
 import type { Option } from "../../type.ts";
-import reminderTime from "../../utils/reminderTime.ts";
-import frequency from "../../utils/frequency.ts";
+import {
+    createRruleString,
+    frequency,
+    reminderTime,
+} from "../../utils/misc.ts";
 import { addNewEvent } from "../../services/eventService.ts";
-import createRruleString from "../../utils/createRruleString.ts";
+import { addEvent } from "../../reducers/eventsReducer.ts";
 
 const EMPTY_REMINDER: Option = {
     key: "",
@@ -134,13 +137,27 @@ const AddNewEvent = () => {
             ...startTimeParsed.data.split(":").map(Number),
         );
 
-        const endDateTime = new Date(
-            selectedEndDate.getFullYear(),
-            selectedEndDate.getMonth(),
-            selectedEndDate.getDate(),
-            ...endTimeParsed.data.split(":").map(Number),
-        );
+        let endDateTime;
 
+        if (!isAllDay) {
+            endDateTime = new Date(
+                selectedEndDate.getFullYear(),
+                selectedEndDate.getMonth(),
+                selectedEndDate.getDate(),
+                ...endTimeParsed.data.split(":").map(Number),
+            );
+        } else {
+            endDateTime = new Date(
+                selectedEndDate.getFullYear(),
+                selectedEndDate.getMonth(),
+                selectedEndDate.getDate(),
+                23,
+                59,
+                59,
+            );
+        }
+
+        console.log(endDateTime);
         if (startDateTime > endDateTime) {
             toast.error("Thời điểm kết thúc phải lớn hơn thời điểm bắt đầu!");
             return;
@@ -169,7 +186,23 @@ const AddNewEvent = () => {
                 ),
             });
 
-            console.log(eventId);
+            dispatch(
+                addEvent({
+                    id: eventId,
+                    title: title.trim(),
+                    isAllDay: isAllDay,
+                    startDateTime: String(startDateTime.getTime()),
+                    endDateTime: String(endDateTime.getTime()),
+                    description: description,
+                    reminder: selectedReminders
+                        .filter((r) => r !== null)
+                        .map((r) => r.key),
+                    rruleString: createRruleString(
+                        selectedRepeat.key,
+                        startDateTime,
+                    ),
+                }),
+            );
             closeDialog();
         } catch (e) {
             toast.error("Có lỗi xảy ra khi tạo sự kiện mới");
@@ -198,7 +231,7 @@ const AddNewEvent = () => {
                         <button
                             className='py-2 px-4 bg-orange-200 rounded-lg  hover:cursor-pointerhover:bg-orange-300 font-bold dark:bg-orange-700 dark:hover:bg-orange-800'
                             onClick={() => {
-                                saveNewEvent();
+                                void saveNewEvent();
                             }}>
                             Thêm
                         </button>

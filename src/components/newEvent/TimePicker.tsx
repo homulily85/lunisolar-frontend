@@ -1,5 +1,6 @@
 import { type Dispatch, type SetStateAction, useMemo } from "react";
-import timesToPick from "../../utils/timesToPick.ts";
+
+import { timesToPick } from "../../utils/misc.ts";
 
 const TimePicker = ({
     name,

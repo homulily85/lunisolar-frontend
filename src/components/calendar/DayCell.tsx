@@ -4,7 +4,11 @@ import AddEventPopup from "../popup/AddEventPopup.tsx";
 import { useAppSelector } from "../../hook.ts";
 import Icon from "@mdi/react";
 import { mdiCircleSmall } from "@mdi/js";
-import findAllEventsInADay from "../../utils/findAllEventsInADay.ts";
+import {
+    isThisEventFinishedAfter,
+    isThisEventStartBefore,
+    isThisEventStartInTimeRange,
+} from "../../utils/events.ts";
 
 const DayCell = ({
     info,
@@ -22,10 +26,31 @@ const DayCell = ({
 
     const eventsInCurrentDay = useMemo(() => {
         if (!token) {
-            return [];
-        } else {
-            return findAllEventsInADay(events, date);
+            return 0;
         }
+
+        const startBound = new Date(
+            date.getFullYear(),
+            date.getMonth(),
+            date.getDate(),
+        );
+        const endBound = new Date(
+            date.getFullYear(),
+            date.getMonth(),
+            date.getDate(),
+            23,
+            59,
+            59,
+            999,
+        );
+
+        return events.reduce((count, e) => {
+            const matches =
+                isThisEventStartInTimeRange(e, startBound, endBound) ||
+                (isThisEventStartBefore(e, startBound) &&
+                    isThisEventFinishedAfter(e, startBound));
+            return count + (matches ? 1 : 0);
+        }, 0);
     }, [date, events, token]);
 
     useEffect(() => {
@@ -62,9 +87,7 @@ const DayCell = ({
                         ${isSelected ? "" : " hover:bg-gray-100 dark:hover:bg-gray-600"}`}>
             <p className={`text-lg ${textColor}`}>{date.getDate()}</p>
             <p className={`text-sm ${textColor}`}>{lunarText}</p>
-            {eventsInCurrentDay.length > 0 && (
-                <Icon path={mdiCircleSmall} size={1} />
-            )}
+            {eventsInCurrentDay > 0 && <Icon path={mdiCircleSmall} size={1} />}
             {open && token && (
                 <AddEventPopup popupRef={popupRef} setOpen={setOpen} />
             )}

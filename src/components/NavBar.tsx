@@ -2,10 +2,10 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Icon from "@mdi/react";
 import { mdiChevronLeft, mdiChevronRight } from "@mdi/js";
 import { useAppDispatch, useAppSelector } from "../hook.ts";
-import monthNames from "../utils/monthNames.ts";
 import { setCurrentSelectedSolarDate } from "../reducers/dateReducer.ts";
 import LoginPopup from "./popup/LoginPopup.tsx";
 import SettingPopup from "./popup/SettingPopup.tsx";
+import { monthNames } from "../utils/misc.ts";
 
 const ICON_SIZE = 1.25;
 

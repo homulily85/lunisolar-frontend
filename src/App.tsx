@@ -1,11 +1,10 @@
 import Calendar from "./components/calendar/Calendar";
-import Sidebar from "./components/Sidebar";
+import Sidebar from "./components/sidebar/Sidebar.tsx";
 import NavBar from "./components/NavBar";
 import AddNewEvent from "./components/newEvent/AddNewEvent";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useEffect, useRef, useState } from "react";
-import decodeAccessToken from "./utils/decodeAccessToken";
 import {
     setAccessToken,
     setId,
@@ -15,6 +14,7 @@ import {
 import { useAppDispatch } from "./hook";
 import { CombinedGraphQLErrors } from "@apollo/client";
 import { getAccessToken } from "./services/authenticationService.ts";
+import { decodeAccessToken } from "./utils/misc.ts";
 
 const App = () => {
     const [theme, setTheme] = useState<"light" | "dark">(() =>

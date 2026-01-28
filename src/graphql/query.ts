@@ -22,11 +22,19 @@ export const ADD_EVENT = gql`
     mutation ($newEvent: EventInput!) {
         addEvent(newEvent: $newEvent) {
             id
+            title
+            place
+            isAllDay
+            startDateTime
+            endDateTime
+            rruleString
+            description
+            reminder
         }
     }
 `;
 
-export const GET_EVENT = gql`
+export const GET_EVENTS = gql`
     query ($rangeStart: String!, $rangeEnd: String!) {
         getEvents(rangeStart: $rangeStart, rangeEnd: $rangeEnd) {
             id

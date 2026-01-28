@@ -8,6 +8,8 @@ import { getEvents } from "../../services/eventService.ts";
 import { toast } from "react-toastify";
 import { setEvents } from "../../reducers/eventsReducer.ts";
 
+import { isSameDate } from "../../utils/misc.ts";
+
 const WEEK_DAYS = [
     "Chủ Nhật",
     "Thứ Hai",
@@ -19,11 +21,6 @@ const WEEK_DAYS = [
 ];
 const MS_PER_DAY = 24 * 60 * 60 * 1000;
 
-const isSameDate = (a: Date, b: Date) =>
-    a.getFullYear() === b.getFullYear() &&
-    a.getMonth() === b.getMonth() &&
-    a.getDate() === b.getDate();
-
 const Calendar = () => {
     const todayTs = useAppSelector((s) => s.date.today);
     const selectedTs = useAppSelector((s) => s.date.currentSelectedSolarDate);
@@ -34,7 +31,16 @@ const Calendar = () => {
     const selectedDate = useMemo(() => new Date(selectedTs), [selectedTs]);
 
     const firstDayOfSelectedMonth = useMemo(
-        () => new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1),
+        () =>
+            new Date(
+                selectedDate.getFullYear(),
+                selectedDate.getMonth(),
+                1,
+                0,
+                0,
+                0,
+                0,
+            ),
         [selectedDate],
     );
 
@@ -106,11 +112,15 @@ const Calendar = () => {
         (async () => {
             try {
                 const events = await getEvents(
-                    firstDayOfSelectedMonth,
+                    new Date(
+                        firstDayOfSelectedMonth.getFullYear(),
+                        firstDayOfSelectedMonth.getMonth() - 1,
+                        15,
+                    ),
                     new Date(
                         firstDayOfSelectedMonth.getFullYear(),
                         firstDayOfSelectedMonth.getMonth() + 1,
-                        0,
+                        15,
                     ),
                 );
                 dispatch(setEvents(events));
