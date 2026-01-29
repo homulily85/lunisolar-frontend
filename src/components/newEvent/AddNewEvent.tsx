@@ -157,7 +157,6 @@ const AddNewEvent = () => {
             );
         }
 
-        console.log(endDateTime);
         if (startDateTime > endDateTime) {
             toast.error("Thời điểm kết thúc phải lớn hơn thời điểm bắt đầu!");
             return;

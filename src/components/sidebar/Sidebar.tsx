@@ -18,7 +18,6 @@ const Sidebar = () => {
         () => new Date(selectedTs),
         [selectedTs],
     );
-    // const events = useAppSelector((state) => state.events);
 
     const selectedLunarDate = useMemo(() => {
         const d = currentSelectedSolarDate;
