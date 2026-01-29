@@ -67,7 +67,7 @@ const App = () => {
             className={
                 "h-screen w-screen grid grid-cols-[1fr_5fr] grid-rows-[auto_1fr]"
             }>
-            <div className='row-span-2 h-full'>
+            <div className='row-span-2 relative'>
                 <Sidebar />
             </div>
 

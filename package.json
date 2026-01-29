@@ -17,6 +17,7 @@
         "@mdi/react": "^1.6.1",
         "@react-oauth/google": "^0.13.4",
         "@reduxjs/toolkit": "^2.11.2",
+        "@tailwindcss/line-clamp": "^0.4.4",
         "@tailwindcss/vite": "^4.1.18",
         "graphql": "^16.12.0",
         "jwt-decode": "^4.0.0",

@@ -77,7 +77,7 @@ const Sidebar = () => {
                     </div>
                 )}
             </div>
-            <div className='px-2'>
+            <div className='px-2 w-full'>
                 <p className='font-bold text-lg'>Sự kiện</p>
                 {accessToken &&
                 isSameDate(new Date(), currentSelectedSolarDate) ? (

@@ -2,5 +2,5 @@ export default {
     darkMode: "media",
     content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
     theme: { extend: {} },
-    plugins: [],
+    plugins: [require("@tailwindcss/line-clamp")],
 };
