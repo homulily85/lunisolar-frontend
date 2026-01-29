@@ -49,3 +49,9 @@ export const GET_EVENTS = gql`
         }
     }
 `;
+
+export const DELETE_EVENT = gql`
+    mutation ($eventId: String!) {
+        deleteEvent(eventId: $eventId)
+    }
+`;

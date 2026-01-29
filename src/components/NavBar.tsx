@@ -57,7 +57,8 @@ const NavBar = () => {
         <div className='p-4 flex justify-between dark:bg-gray-800 dark:text-white'>
             <div className='flex justify-center items-center gap-2'>
                 <button
-                    aria-label='Previous month'
+                    aria-label='Tháng trước'
+                    title='Tháng trước'
                     className='hover:bg-gray-100 active:bg-gray-200 hover:cursor-pointer dark:hover:bg-gray-700 dark:active:bg-gray-800 rounded-full p-2 flex items-center justify-center'
                     onClick={() => changeMonth(-1)}>
                     <Icon path={mdiChevronLeft} size={ICON_SIZE} />
@@ -66,7 +67,8 @@ const NavBar = () => {
                 <p className='text-2xl font-bold w-70 text-center'>{label}</p>
 
                 <button
-                    aria-label='Next month'
+                    aria-label='Tháng sau'
+                    title='Tháng sau'
                     className='hover:bg-gray-100 active:bg-gray-200  hover:cursor-pointer dark:hover:bg-gray-700 dark:active:bg-gray-800 rounded-full p-2 flex items-center justify-center'
                     onClick={() => changeMonth(1)}>
                     <Icon path={mdiChevronRight} size={ICON_SIZE} />
@@ -75,7 +77,8 @@ const NavBar = () => {
                 <button
                     onClick={jumpToToday}
                     className='font-bold hover:bg-gray-100 hover:cursor-pointer active:bg-gray-200 rounded-xl border py-2 px-8 border-gray-400 dark:hover:bg-gray-700 dark:active:bg-gray-800'
-                    aria-label='Jump to today'>
+                    aria-label='Hôm nay'
+                    title='Hôm nay'>
                     Hôm nay
                 </button>
             </div>
