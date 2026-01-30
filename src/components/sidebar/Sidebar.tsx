@@ -4,9 +4,8 @@ import { mdiPlus } from "@mdi/js";
 import { useAppDispatch, useAppSelector } from "../../hook.ts";
 import { setShowAddEventDialog } from "../../reducers/uiReducer.ts";
 import { LunarCalendar } from "@dqcai/vn-lunar";
-import EventToday from "./EventToday.tsx";
-import EventOtherDay from "./EventOtherDay.tsx";
-import { isSameDate, monthNames } from "../../utils/misc.ts";
+import { monthNames } from "../../utils/misc.ts";
+import EventList from "./EventList.tsx";
 
 const Sidebar = () => {
     const accessToken = useAppSelector((state) => state.user.accessToken);
@@ -77,14 +76,13 @@ const Sidebar = () => {
                     </div>
                 )}
             </div>
-            <div className='px-2 w-full'>
-                <p className='font-bold text-lg'>Sự kiện</p>
-                {accessToken &&
-                isSameDate(new Date(), currentSelectedSolarDate) ? (
-                    <EventToday />
-                ) : (
-                    <EventOtherDay date={currentSelectedSolarDate} />
-                )}
+            <div className='px-2 w-full h-full flex flex-col overflow-hidden'>
+                <p className='font-bold text-lg shrink-0'>Sự kiện</p>
+                <div className='flex-1 overflow-y-auto mt-2 dark:scrollbar dark:scrollbar-track-gray-800 dark:scrollbar-thumb-gray-300'>
+                    {accessToken && (
+                        <EventList date={currentSelectedSolarDate} />
+                    )}
+                </div>
             </div>
         </div>
     );
