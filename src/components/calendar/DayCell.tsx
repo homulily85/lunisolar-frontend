@@ -1,26 +1,21 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { type MouseEvent, useCallback, useMemo } from "react";
 import type { DayInfo } from "../../type.ts";
-import AddEventPopup from "../popup/AddEventPopup.tsx";
-import { useAppSelector } from "../../hook.ts";
-import Icon from "@mdi/react";
-import { mdiCircleSmall } from "@mdi/js";
+import { useAppDispatch, useAppSelector } from "../../hook.ts";
 import {
     isThisEventFinishedAfter,
     isThisEventStartBefore,
     isThisEventStartInTimeRange,
 } from "../../utils/events.ts";
+import { Popover, PopoverButton, PopoverPanel } from "@headlessui/react";
+import Icon from "@mdi/react";
+import { mdiCircleSmall, mdiPlus } from "@mdi/js";
+import { setShowAddEventDialog } from "../../reducers/uiReducer.ts";
+import { setCurrentSelectedSolarDate } from "../../reducers/dateReducer.ts";
 
-const DayCell = ({
-    info,
-    onSelect,
-}: {
-    info: DayInfo;
-    onSelect: (ts: number) => void;
-}) => {
+const DayCell = ({ info }: { info: DayInfo }) => {
     const { date, ts, lunarText, isToday, isSelected, isCurrentMonth } = info;
+    const dispatch = useAppDispatch();
 
-    const [open, setOpen] = useState(false);
-    const popupRef = useRef<HTMLDivElement>(null);
     const token = useAppSelector((state) => state.user.accessToken);
     const events = useAppSelector((state) => state.events);
 
@@ -53,16 +48,20 @@ const DayCell = ({
         }, 0);
     }, [date, events, token]);
 
-    useEffect(() => {
-        function handleClickOutside(e: MouseEvent) {
-            if (!popupRef.current?.contains(e.target as Node)) {
-                setOpen(false);
-            }
-        }
-        document.addEventListener("mousedown", handleClickOutside);
-        return () =>
-            document.removeEventListener("mousedown", handleClickOutside);
-    }, []);
+    const onClick = useCallback(
+        (e: MouseEvent<HTMLButtonElement>) => {
+            e.stopPropagation();
+            dispatch(setShowAddEventDialog(true));
+        },
+        [dispatch],
+    );
+
+    const setSelectedDay = useCallback(
+        (ts: number) => {
+            dispatch(setCurrentSelectedSolarDate(ts));
+        },
+        [dispatch],
+    );
 
     const bgClass = isSelected
         ? "bg-orange-200 dark:bg-orange-700"
@@ -77,21 +76,28 @@ const DayCell = ({
                 : "text-gray-500 dark:text-gray-400";
 
     return (
-        <div
-            data-date={ts}
-            onClick={() => {
-                setOpen(true);
-                onSelect(ts);
-            }}
-            className={`relative ${bgClass} justify-items-center rounded-lg py-2 px-4 h-full 
-                        ${isSelected ? "" : " hover:bg-gray-100 dark:hover:bg-gray-600"}`}>
-            <p className={`text-lg ${textColor}`}>{date.getDate()}</p>
-            <p className={`text-sm ${textColor}`}>{lunarText}</p>
-            {eventsInCurrentDay > 0 && <Icon path={mdiCircleSmall} size={1} />}
-            {open && token && (
-                <AddEventPopup popupRef={popupRef} setOpen={setOpen} />
+        <Popover className='relative h-full'>
+            <PopoverButton
+                onClick={() => setSelectedDay(ts)}
+                data-date={ts}
+                className={`${bgClass} flex flex-col justify-start items-center rounded-lg py-2 px-4 h-full w-full focus:outline-none ${isSelected ? "" : " hover:bg-gray-100 dark:hover:bg-gray-600"}`}>
+                <p className={`text-lg ${textColor}`}>{date.getDate()}</p>
+                <p className={`text-sm ${textColor}`}>{lunarText}</p>
+                {eventsInCurrentDay > 0 && (
+                    <Icon path={mdiCircleSmall} size={1} />
+                )}
+            </PopoverButton>
+            {token && (
+                <PopoverPanel
+                    anchor={"right"}
+                    className={`bg-white hover:cursor-pointer hover:bg-gray-100 dark:bg-gray-500 dark:hover:bg-gray-600 rounded shadow dark:text-white`}>
+                    <button className='w-full h-full p-3' onClick={onClick}>
+                        <Icon path={mdiPlus} size={1} className='inline pb-1' />
+                        Thêm sự kiện
+                    </button>
+                </PopoverPanel>
             )}
-        </div>
+        </Popover>
     );
 };
 

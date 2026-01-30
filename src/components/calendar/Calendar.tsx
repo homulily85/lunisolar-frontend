@@ -78,13 +78,6 @@ const Calendar = () => {
         return arr;
     }, [firstDayOfSelectedMonth, today, selectedDate]);
 
-    const setSelectedDay = useCallback(
-        (ts: number) => {
-            dispatch(setCurrentSelectedSolarDate(ts));
-        },
-        [dispatch],
-    );
-
     const changeMonth = useCallback(
         (delta: number) => {
             const d = new Date(selectedTs);
@@ -144,9 +137,7 @@ const Calendar = () => {
             ))}
 
             {daysInfo.map((info) => (
-                <div key={info.key}>
-                    <DayCell info={info} onSelect={setSelectedDay} />
-                </div>
+                <DayCell info={info} key={info.key} />
             ))}
         </div>
     );

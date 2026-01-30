@@ -76,14 +76,15 @@ const Sidebar = () => {
                     </div>
                 )}
             </div>
-            <div className='px-2 w-full h-full flex flex-col overflow-hidden'>
-                <p className='font-bold text-lg shrink-0'>Sự kiện</p>
-                <div className='flex-1 overflow-y-auto mt-2 dark:scrollbar dark:scrollbar-track-gray-800 dark:scrollbar-thumb-gray-300'>
-                    {accessToken && (
+
+            {accessToken && (
+                <div className='px-2 w-full h-full flex flex-col overflow-hidden'>
+                    <p className='font-bold text-lg shrink-0'>Sự kiện</p>
+                    <div className='flex-1 overflow-y-auto mt-2 dark:scrollbar dark:scrollbar-track-gray-800 dark:scrollbar-thumb-gray-300'>
                         <EventList date={currentSelectedSolarDate} />
-                    )}
+                    </div>
                 </div>
-            </div>
+            )}
         </div>
     );
 };

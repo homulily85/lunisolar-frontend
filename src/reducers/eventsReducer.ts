@@ -5,8 +5,8 @@ const eventSlice = createSlice({
     name: "events",
     initialState: [] as EventFromServer[],
     reducers: {
-        setEvents: (state, action: PayloadAction<EventFromServer[]>) => {
-            state.splice(0, state.length, ...action.payload);
+        setEvents: (_state, action: PayloadAction<EventFromServer[]>) => {
+            return action.payload;
         },
         addEvent: (state, action: PayloadAction<EventFromServer>) => {
             state.push(action.payload);
