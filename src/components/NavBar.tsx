@@ -140,7 +140,7 @@ const NavBar = () => {
 
             {!accessToken && (
                 <Popover className='relative'>
-                    <PopoverButton className=' focus:outline-none hover:cursor-pointer hover:bg-orange-700 active:bg-orange-800 rounded-lg flex items-center justify-center px-4 py-2 text-white font-bold'>
+                    <PopoverButton className=' focus:outline-none bg-orange-600 hover:cursor-pointer hover:bg-orange-700 active:bg-orange-800 rounded-lg flex items-center justify-center px-4 py-2 text-white font-bold'>
                         Đăng nhập
                     </PopoverButton>
 

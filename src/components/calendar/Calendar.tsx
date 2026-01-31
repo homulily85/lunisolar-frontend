@@ -1,4 +1,10 @@
-import { useCallback, useEffect, useMemo, type WheelEvent } from "react";
+import {
+    useCallback,
+    useEffect,
+    useMemo,
+    useRef,
+    type WheelEvent,
+} from "react";
 import { useAppDispatch, useAppSelector } from "../../hook.ts";
 import { LunarCalendar } from "@dqcai/vn-lunar";
 import { setCurrentSelectedSolarDate } from "../../reducers/dateReducer.ts";
@@ -87,8 +93,22 @@ const Calendar = () => {
         [dispatch, selectedTs],
     );
 
+    const lastScrollTime = useRef<number>(0);
+
     const onWheel = useCallback(
         (e: WheelEvent<HTMLDivElement>) => {
+            const now = Date.now();
+
+            if (now - lastScrollTime.current < 250) {
+                return;
+            }
+
+            if (Math.abs(e.deltaY) < 10) {
+                return;
+            }
+
+            lastScrollTime.current = now;
+
             if (e.deltaY > 0) {
                 changeMonth(1);
             } else {

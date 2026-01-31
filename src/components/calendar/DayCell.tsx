@@ -89,7 +89,7 @@ const DayCell = ({ info }: { info: DayInfo }) => {
             </PopoverButton>
             {token && (
                 <PopoverPanel
-                    anchor={"right"}
+                    anchor={{ to: "right", gap: "0.25rem" }}
                     className={`bg-white hover:cursor-pointer hover:bg-gray-100 dark:bg-gray-500 dark:hover:bg-gray-600 rounded shadow dark:text-white`}>
                     <button className='w-full h-full p-3' onClick={onClick}>
                         <Icon path={mdiPlus} size={1} className='inline pb-1' />
