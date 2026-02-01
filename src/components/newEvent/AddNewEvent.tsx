@@ -26,6 +26,7 @@ import {
 } from "../../utils/misc.ts";
 import { addNewEvent } from "../../services/eventService.ts";
 import { addEvent } from "../../reducers/eventsReducer.ts";
+import { expandEvent } from "../../utils/events.ts";
 
 const EMPTY_REMINDER: Option = {
     key: "",
@@ -186,8 +187,8 @@ const AddNewEvent = () => {
                 ),
             });
 
-            dispatch(
-                addEvent({
+            const expandedEvent = expandEvent(
+                {
                     id: eventId,
                     place: location,
                     title: title.trim(),
@@ -202,8 +203,21 @@ const AddNewEvent = () => {
                         selectedRepeat.key,
                         startDateTime,
                     ),
-                }),
+                },
+                new Date(
+                    startDateTime.getFullYear(),
+                    startDateTime.getMonth() - 1,
+                    15,
+                ),
+                new Date(
+                    startDateTime.getFullYear(),
+                    startDateTime.getMonth() + 1,
+                    15,
+                ),
             );
+
+            expandedEvent.forEach((e) => dispatch(addEvent(e)));
+
             closeDialog();
         } catch (e) {
             toast.error("Có lỗi xảy ra khi tạo sự kiện mới");

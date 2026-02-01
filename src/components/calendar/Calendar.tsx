@@ -8,13 +8,14 @@ import {
 import { useAppDispatch, useAppSelector } from "../../hook.ts";
 import { LunarCalendar } from "@dqcai/vn-lunar";
 import { setCurrentSelectedSolarDate } from "../../reducers/dateReducer.ts";
-import type { DayInfo } from "../../type.ts";
+import type { DayInfo, EventFromServer } from "../../type.ts";
 import DayCell from "./DayCell.tsx";
 import { getEvents } from "../../services/eventService.ts";
 import { toast } from "react-toastify";
 import { setEvents } from "../../reducers/eventsReducer.ts";
 
 import { isSameDate } from "../../utils/misc.ts";
+import { expandEvent } from "../../utils/events.ts";
 
 const WEEK_DAYS = [
     "Chủ Nhật",
@@ -124,19 +125,28 @@ const Calendar = () => {
         }
         (async () => {
             try {
-                const events = await getEvents(
-                    new Date(
-                        firstDayOfSelectedMonth.getFullYear(),
-                        firstDayOfSelectedMonth.getMonth() - 1,
-                        15,
-                    ),
-                    new Date(
-                        firstDayOfSelectedMonth.getFullYear(),
-                        firstDayOfSelectedMonth.getMonth() + 1,
-                        15,
-                    ),
+                const endRange = new Date(
+                    firstDayOfSelectedMonth.getFullYear(),
+                    firstDayOfSelectedMonth.getMonth() + 1,
+                    15,
                 );
-                dispatch(setEvents(events));
+
+                const startRange = new Date(
+                    firstDayOfSelectedMonth.getFullYear(),
+                    firstDayOfSelectedMonth.getMonth() - 1,
+                    15,
+                );
+                const events = await getEvents(startRange, endRange);
+
+                const expandedEvents: EventFromServer[] = [];
+
+                for (const event of events) {
+                    expandedEvents.push(
+                        ...expandEvent(event, startRange, endRange),
+                    );
+                }
+
+                dispatch(setEvents(expandedEvents));
             } catch (e) {
                 console.log(e);
                 toast.error("Có lỗi xảy ra!");

@@ -55,6 +55,7 @@ export const addNewEvent = async (event: EventFromClient) => {
         console.log(result.error);
         throw new Error();
     }
+
     return result.data.addEvent.id;
 };
 
@@ -77,6 +78,7 @@ export const getEvents = async (startRange: Date, endRange: Date) => {
         console.log(result.error);
         throw new Error();
     }
+
     return result.data.getEvents;
 };
 
