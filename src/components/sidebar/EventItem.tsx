@@ -9,6 +9,10 @@ import { removeEvent } from "../../reducers/eventsReducer.ts";
 import { toast } from "react-toastify";
 import Icon from "@mdi/react";
 import { mdiCalendarEdit, mdiDelete } from "@mdi/js";
+import {
+    setEventToBeModified,
+    setShowUpdateEventDialog,
+} from "../../reducers/uiReducer.ts";
 
 const EventItem = ({ event }: { event: EventFromServer }) => {
     const label = `${event.title}\n${formatDateTime(new Date(event.startDateTime))} - ${formatDateTime(new Date(event.endDateTime))}`;
@@ -63,8 +67,12 @@ const EventItem = ({ event }: { event: EventFromServer }) => {
                         </p>
 
                         <button
-                            aria-label='Cập nhật sự kiện'
-                            title='Cập nhật sự kiện'
+                            onClick={() => {
+                                dispatch(setEventToBeModified(event));
+                                dispatch(setShowUpdateEventDialog(true));
+                            }}
+                            aria-label='Chỉnh sửa sự kiện'
+                            title='Chỉnh sửa sự kiện'
                             className='hover:cursor-pointer dark:hover:bg-gray-600  hover:bg-gray-100 rounded-md'>
                             <div className='flex justify-center'>
                                 <Icon path={mdiCalendarEdit} size={1} />

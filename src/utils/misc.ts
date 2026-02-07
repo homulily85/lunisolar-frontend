@@ -2,28 +2,6 @@ import { RRule } from "rrule";
 import { jwtDecode } from "jwt-decode";
 import type { AccessTokenPayload, Option } from "../type.ts";
 
-const FREQUENCY_OPTIONS: Record<string, unknown> = {
-    none: undefined,
-    everyday: { freq: RRule.DAILY },
-    everyweek: { freq: RRule.WEEKLY },
-    "every-two-weeks": { freq: RRule.WEEKLY, interval: 2 },
-    "every-month": { freq: RRule.MONTHLY },
-    "every-year": { freq: RRule.YEARLY },
-};
-
-export const createRruleString = (
-    frequency: string,
-    startDate: Date,
-): string => {
-    if (!startDate || isNaN(startDate.getTime())) return "";
-
-    const opts = FREQUENCY_OPTIONS[frequency];
-    if (!opts) return "";
-
-    const rule = new RRule({ ...opts, dtstart: startDate });
-    return rule.toString();
-};
-
 export const decodeAccessToken = (token: string) => {
     return jwtDecode(token) as AccessTokenPayload;
 };
@@ -74,6 +52,17 @@ export const reminderTime: Option[] = [
     { key: "1-month", value: "Trước 1 tháng" },
 ];
 
+export const getReminderOptionsFromKeys = (
+    keys: string[] | undefined,
+): (Option | null)[] => {
+    return keys
+        ? keys.map((key) => {
+              const foundOption = reminderTime.find((opt) => opt.key === key);
+              return foundOption || null;
+          })
+        : [];
+};
+
 export const timesToPick = () => {
     const res: string[] = [];
     for (let hour = 0; hour < 24; hour++) {
@@ -94,3 +83,33 @@ export const frequency: Option[] = [
     { key: "every-month", value: "Hàng tháng" },
     { key: "every-year", value: "Hàng năm" },
 ];
+
+export const getFrequencyOptionFromRRule = (
+    rruleString: string | null | undefined,
+): Option => {
+    let detectedKey = "none";
+
+    if (rruleString) {
+        try {
+            const options = RRule.parseString(rruleString);
+            const freq = options.freq;
+            const interval = options.interval || 1;
+
+            if (freq === RRule.DAILY && interval === 1)
+                detectedKey = "everyday";
+            else if (freq === RRule.WEEKLY && interval === 1)
+                detectedKey = "everyweek";
+            else if (freq === RRule.WEEKLY && interval === 2)
+                detectedKey = "every-two-weeks";
+            else if (freq === RRule.MONTHLY && interval === 1)
+                detectedKey = "every-month";
+            else if (freq === RRule.YEARLY && interval === 1)
+                detectedKey = "every-year";
+        } catch (e) {
+            console.error("RRule parse error", e);
+        }
+    }
+    const foundOption = frequency.find((f) => f.key === detectedKey);
+
+    return foundOption || frequency[0];
+};

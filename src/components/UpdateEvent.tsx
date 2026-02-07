@@ -9,66 +9,102 @@ import {
     ListboxOptions,
     Switch,
 } from "@headlessui/react";
-import { useAppDispatch, useAppSelector } from "../../hook.ts";
-import { setShowAddEventDialog } from "../../reducers/uiReducer.ts";
+import { useAppDispatch, useAppSelector } from "../hook.ts";
+import { setShowUpdateEventDialog } from "../reducers/uiReducer.ts";
 import { Fragment, useCallback, useEffect, useState } from "react";
-import TimePicker from "./TimePicker.tsx";
-import DatePicker from "./DatePicker.tsx";
+import TimePicker from "./newEvent/TimePicker.tsx";
+import DatePicker from "./newEvent/DatePicker.tsx";
 import { mdiChevronDown, mdiDelete, mdiPlus } from "@mdi/js";
 import Icon from "@mdi/react";
 import { toast } from "react-toastify";
 import { z } from "zod";
-import type { Option } from "../../type.ts";
-import { frequency, reminderTime } from "../../utils/misc.ts";
-import { addNewEvent } from "../../services/eventService.ts";
-import { addEvent } from "../../reducers/eventsReducer.ts";
-import { createRruleString } from "../../utils/events.ts";
+import type { EventFromServer, Option } from "../type.ts";
+import {
+    frequency,
+    getFrequencyOptionFromRRule,
+    getReminderOptionsFromKeys,
+    reminderTime,
+} from "../utils/misc.ts";
+import { updateAnEvent } from "../services/eventService.ts";
+import { updateEvent } from "../reducers/eventsReducer.ts";
+import { createRruleString } from "../utils/events.ts";
 
 const EMPTY_REMINDER: Option = {
     key: "",
     value: "Chọn thời điểm",
 };
 
-const AddNewEvent = () => {
-    const selectedTs = useAppSelector((s) => s.date.currentSelectedSolarDate);
-    const [title, setTitle] = useState("");
-    const [location, setLocation] = useState("");
+function formatTimeHHMM(input: Date | string | number): string {
+    const d = input instanceof Date ? input : new Date(input);
+    const hh = String(d.getHours()).padStart(2, "0");
+    const mm = String(d.getMinutes()).padStart(2, "0");
+    return `${hh}:${mm}`;
+}
 
-    const [isAllDay, setIsAllDay] = useState(false);
+const UpdateEvent = () => {
+    const event = useAppSelector(
+        (s) => s.ui.eventToBeModified as EventFromServer,
+    );
+
+    const showDialog = useAppSelector(
+        (state) => state.ui.showUpdateEventDialog,
+    );
+
+    const [title, setTitle] = useState(event.title);
+
+    const [location, setLocation] = useState(event.place);
+
+    const [isAllDay, setIsAllDay] = useState(event.isAllDay);
 
     const [selectedStartDate, setSelectedStartDate] = useState<Date>(
-        new Date(selectedTs),
+        new Date(event.startDateTime),
     );
-    const [selectedStartTime, setSelectedStartTime] = useState("00:00");
-    const [selectedEndTime, setSelectedEndTime] = useState("00:00");
+
+    const [selectedStartTime, setSelectedStartTime] = useState(
+        formatTimeHHMM(event.startDateTime),
+    );
+
     const [selectedEndDate, setSelectedEndDate] = useState<Date>(
-        new Date(selectedTs),
+        new Date(event.endDateTime),
     );
 
-    const [selectedRepeat, setSelectedRepeat] = useState<Option>(frequency[0]);
+    const [selectedEndTime, setSelectedEndTime] = useState(
+        formatTimeHHMM(event.endDateTime),
+    );
 
-    const [description, setDescription] = useState("");
+    const [selectedRepeat, setSelectedRepeat] = useState<Option>(
+        getFrequencyOptionFromRRule(event.rruleString),
+    );
+
+    const [description, setDescription] = useState(event.description);
 
     const [selectedReminders, setSelectedReminders] = useState<
         (Option | null)[]
-    >([]);
+    >(getReminderOptionsFromKeys(event.reminder));
 
-    const showDialog = useAppSelector((state) => state.ui.showAddEventDialog);
     const dispatch = useAppDispatch();
 
     const resetDialog = useCallback(() => {
-        setTitle("");
-        setLocation("");
-        setIsAllDay(false);
-        setSelectedRepeat(frequency[0]);
-        setSelectedReminders([]);
-        setDescription("");
-        setSelectedStartTime("00:00");
-        setSelectedEndTime("00:00");
-    }, []);
+        setTitle(event.title);
+        setLocation(event.place);
+        setIsAllDay(event.isAllDay);
+        setSelectedRepeat(getFrequencyOptionFromRRule(event.rruleString));
+        setSelectedReminders(getReminderOptionsFromKeys(event.reminder));
+        setDescription(event.description);
+        setSelectedStartTime(formatTimeHHMM(event.endDateTime));
+        setSelectedEndTime(formatTimeHHMM(event.endDateTime));
+    }, [
+        event.description,
+        event.endDateTime,
+        event.isAllDay,
+        event.place,
+        event.reminder,
+        event.rruleString,
+        event.title,
+    ]);
 
     const closeDialog = useCallback(() => {
-        dispatch(setShowAddEventDialog(false));
+        dispatch(setShowUpdateEventDialog(false));
         resetDialog();
     }, [dispatch, resetDialog]);
 
@@ -105,11 +141,28 @@ const AddNewEvent = () => {
 
     useEffect(() => {
         // eslint-disable-next-line react-hooks/set-state-in-effect
-        setSelectedStartDate(new Date(selectedTs));
-        setSelectedEndDate(new Date(selectedTs));
-    }, [selectedTs]);
+        setTitle(event.title);
+        setLocation(event.place);
+        setIsAllDay(event.isAllDay);
+        setSelectedRepeat(getFrequencyOptionFromRRule(event.rruleString));
+        setSelectedReminders(getReminderOptionsFromKeys(event.reminder));
+        setDescription(event.description);
+        setSelectedStartDate(new Date(event.startDateTime));
+        setSelectedEndDate(new Date(event.endDateTime));
+        setSelectedStartTime(formatTimeHHMM(event.startDateTime));
+        setSelectedEndTime(formatTimeHHMM(event.endDateTime));
+    }, [
+        event.description,
+        event.endDateTime,
+        event.isAllDay,
+        event.place,
+        event.reminder,
+        event.rruleString,
+        event.startDateTime,
+        event.title,
+    ]);
 
-    const saveNewEvent = async () => {
+    const handleUpdate = async () => {
         if (title.trim() === "") {
             toast.error("Trường tiêu đề không được trống!");
             return;
@@ -167,7 +220,8 @@ const AddNewEvent = () => {
         }
 
         try {
-            const eventId = await addNewEvent({
+            await updateAnEvent({
+                id: event.id.split("_")[0],
                 title: title.trim(),
                 place: location,
                 isAllDay: isAllDay,
@@ -184,10 +238,10 @@ const AddNewEvent = () => {
             });
 
             dispatch(
-                addEvent({
-                    id: eventId,
-                    place: location,
+                updateEvent({
+                    id: event.id.split("_")[0],
                     title: title.trim(),
+                    place: location,
                     isAllDay: isAllDay,
                     startDateTime: startDateTime.getTime(),
                     endDateTime: endDateTime.getTime(),
@@ -225,14 +279,14 @@ const AddNewEvent = () => {
                             Hủy
                         </button>
                         <DialogTitle className='font-bold text-2xl text-center self-center'>
-                            Sự kiện mới
+                            Chỉnh sửa sự kiện
                         </DialogTitle>
                         <button
                             className='py-2 px-4 bg-orange-200 rounded-lg  hover:cursor-pointerhover:bg-orange-300 font-bold dark:bg-orange-700 dark:hover:bg-orange-800'
                             onClick={() => {
-                                void saveNewEvent();
+                                void handleUpdate();
                             }}>
-                            Thêm
+                            Sửa
                         </button>
                     </div>
 
@@ -445,4 +499,4 @@ const AddNewEvent = () => {
     );
 };
 
-export default AddNewEvent;
+export default UpdateEvent;

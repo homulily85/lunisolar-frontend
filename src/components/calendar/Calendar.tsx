@@ -137,15 +137,12 @@ const Calendar = () => {
                     15,
                 );
                 const events = await getEvents(startRange, endRange);
-
                 const expandedEvents: EventFromServer[] = [];
-
-                for (const event of events) {
+                for (const e of events) {
                     expandedEvents.push(
-                        ...expandEvent(event, startRange, endRange),
+                        ...expandEvent(e, startRange, endRange),
                     );
                 }
-
                 dispatch(setEvents(expandedEvents));
             } catch (e) {
                 console.log(e);

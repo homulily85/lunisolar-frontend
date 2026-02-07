@@ -15,6 +15,7 @@ import { useAppDispatch } from "./hook";
 import { CombinedGraphQLErrors } from "@apollo/client";
 import { getAccessToken } from "./services/authenticationService.ts";
 import { decodeAccessToken } from "./utils/misc.ts";
+import UpdateEvent from "./components/UpdateEvent.tsx";
 
 const App = () => {
     const [theme, setTheme] = useState<"light" | "dark">(() =>
@@ -77,6 +78,7 @@ const App = () => {
                 <Calendar />
             </div>
             <AddNewEvent />
+            <UpdateEvent />
             <ToastContainer
                 theme={theme}
                 position='top-right'

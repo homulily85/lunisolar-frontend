@@ -55,3 +55,19 @@ export const DELETE_EVENT = gql`
         deleteEvent(eventId: $eventId)
     }
 `;
+
+export const UPDATE_EVENT = gql`
+    mutation ($eventToBeUpdated: EventFromClient!) {
+        updateEvent(eventToBeUpdated: $eventToBeUpdated) {
+            id
+            title
+            place
+            isAllDay
+            startDateTime
+            endDateTime
+            rruleString
+            description
+            reminder
+        }
+    }
+`;

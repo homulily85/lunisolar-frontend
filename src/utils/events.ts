@@ -1,5 +1,15 @@
 import { type EventFromServer } from "../type.ts";
-import { rrulestr } from "rrule";
+import { datetime, RRule, rrulestr } from "rrule";
+import { toZonedTime } from "date-fns-tz";
+
+const FREQUENCY_OPTIONS: Record<string, unknown> = {
+    none: undefined,
+    everyday: { freq: RRule.DAILY },
+    everyweek: { freq: RRule.WEEKLY },
+    "every-two-weeks": { freq: RRule.WEEKLY, interval: 2 },
+    "every-month": { freq: RRule.MONTHLY },
+    "every-year": { freq: RRule.YEARLY },
+};
 
 export const isThisEventFinishedAfter = (
     event: EventFromServer,
@@ -46,15 +56,13 @@ export const expandEvent = (
         const duration = event.endDateTime - event.startDateTime;
 
         const rule = rrulestr(event.rruleString, {
-            dtstart: new Date(event.startDateTime),
             cache: true,
         });
 
         const dates = rule.between(startRange, endRange, true);
-
         const instances = dates.map((date) => {
             const instance = { ...event };
-
+            date.setHours(date.getHours() - 7);
             instance.startDateTime = date.getTime();
             instance.endDateTime = new Date(
                 date.getTime() + duration,
@@ -68,4 +76,34 @@ export const expandEvent = (
         expandedEvents.push(...instances);
         return expandedEvents;
     }
+};
+
+export const createRruleString = (
+    frequency: string,
+    startDate: Date,
+    timezone: string = "Asia/Ho_Chi_Minh",
+): string => {
+    if (!startDate || isNaN(startDate.getTime())) return "";
+
+    const opts = FREQUENCY_OPTIONS[frequency];
+    if (!opts) return "";
+
+    const zonedDate = toZonedTime(startDate, timezone);
+
+    const floatingDate = datetime(
+        zonedDate.getFullYear(),
+        zonedDate.getMonth() + 1,
+        zonedDate.getDate(),
+        zonedDate.getHours(),
+        zonedDate.getMinutes(),
+        zonedDate.getSeconds(),
+    );
+
+    const rule = new RRule({
+        ...opts,
+        dtstart: floatingDate,
+        tzid: timezone,
+    });
+
+    return rule.toString();
 };
