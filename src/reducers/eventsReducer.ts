@@ -33,19 +33,19 @@ const eventSlice = createSlice({
 
         removeEvent: (state, action: PayloadAction<EventFromServer>) => {
             return state.filter(
-                (e) => e.id.split("_")[0] !== action.payload.id,
+                (e) => e.id.split("_")[0] !== action.payload.id.split("_")[0],
             );
         },
 
         updateEvent: (state, action: PayloadAction<EventFromServer>) => {
-            const event = state.filter((e) => {
+            const events = state.filter((e) => {
                 return e.id.split("_")[0] !== action.payload.id;
             });
 
             const startDateTime = new Date(action.payload.startDateTime);
 
             return [
-                ...event,
+                ...events,
                 ...expandEvent(
                     action.payload,
                     new Date(

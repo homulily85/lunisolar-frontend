@@ -113,3 +113,13 @@ export const getFrequencyOptionFromRRule = (
 
     return foundOption || frequency[0];
 };
+
+export const deleteOptions: Option[] = [
+    { key: "all", value: "Tất cả sự kiện" },
+    {
+        key: "subsequent",
+        value: "Sự kiện này và các sự kiện tiếp theo",
+    },
+    { key: "current", value: "Chỉ sự kiện này" },
+    { key: "cancel", value: "Hủy" },
+];

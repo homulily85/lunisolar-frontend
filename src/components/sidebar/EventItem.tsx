@@ -4,33 +4,26 @@ import { formatDateTime } from "../../utils/misc.ts";
 import { Popover, PopoverButton, PopoverPanel } from "@headlessui/react";
 import { useAppDispatch } from "../../hook.ts";
 import { useCallback } from "react";
-import { deleteEvent } from "../../services/eventService.ts";
-import { removeEvent } from "../../reducers/eventsReducer.ts";
-import { toast } from "react-toastify";
 import Icon from "@mdi/react";
 import { mdiCalendarEdit, mdiDelete } from "@mdi/js";
 import {
+    setEventTobeDeleted,
     setEventToBeModified,
+    setShowDeleteOptionDialog,
     setShowUpdateEventDialog,
 } from "../../reducers/uiReducer.ts";
 
 const EventItem = ({ event }: { event: EventFromServer }) => {
     const label = `${event.title}\n${formatDateTime(new Date(event.startDateTime))} - ${formatDateTime(new Date(event.endDateTime))}`;
     const dispatch = useAppDispatch();
-    const handleDelete = useCallback(async () => {
-        const ok = confirm(
-            `Bạn có chắc chắn muốn xóa sự kiện ${event.title} không?`,
-        );
-        if (!ok) {
-            return;
-        }
-        try {
-            await deleteEvent(event);
-            dispatch(removeEvent(event));
-        } catch (e) {
-            console.log(e);
-            toast.error("Có lỗi xảy ra!");
-        }
+    const handleDelete = useCallback(() => {
+        dispatch(setShowDeleteOptionDialog(true));
+        dispatch(setEventTobeDeleted(event));
+    }, [dispatch, event]);
+
+    const handleUpdate = useCallback(() => {
+        dispatch(setEventToBeModified(event));
+        dispatch(setShowUpdateEventDialog(true));
     }, [dispatch, event]);
 
     return (
@@ -67,10 +60,7 @@ const EventItem = ({ event }: { event: EventFromServer }) => {
                         </p>
 
                         <button
-                            onClick={() => {
-                                dispatch(setEventToBeModified(event));
-                                dispatch(setShowUpdateEventDialog(true));
-                            }}
+                            onClick={handleUpdate}
                             aria-label='Chỉnh sửa sự kiện'
                             title='Chỉnh sửa sự kiện'
                             className='hover:cursor-pointer dark:hover:bg-gray-600  hover:bg-gray-100 rounded-md'>

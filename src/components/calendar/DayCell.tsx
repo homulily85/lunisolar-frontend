@@ -41,9 +41,10 @@ const DayCell = ({ info }: { info: DayInfo }) => {
 
         return events.reduce((count, e) => {
             const matches =
-                isThisEventStartInTimeRange(e, startBound, endBound) ||
-                (isThisEventStartBefore(e, startBound) &&
-                    isThisEventFinishedAfter(e, startBound));
+                (!e.rruleString || e.id.split("_").length > 1) &&
+                (isThisEventStartInTimeRange(e, startBound, endBound) ||
+                    (isThisEventStartBefore(e, startBound) &&
+                        isThisEventFinishedAfter(e, startBound)));
             return count + (matches ? 1 : 0);
         }, 0);
     }, [date, events, token]);

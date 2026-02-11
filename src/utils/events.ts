@@ -1,5 +1,5 @@
 import { type EventFromServer } from "../type.ts";
-import { datetime, RRule, rrulestr } from "rrule";
+import { datetime, RRule, RRuleSet, rrulestr } from "rrule";
 import { toZonedTime } from "date-fns-tz";
 
 const FREQUENCY_OPTIONS: Record<string, unknown> = {
@@ -74,6 +74,7 @@ export const expandEvent = (
         });
 
         expandedEvents.push(...instances);
+        expandedEvents.push(event);
         return expandedEvents;
     }
 };
@@ -105,5 +106,61 @@ export const createRruleString = (
         tzid: timezone,
     });
 
-    return rule.toString();
+    const ruleSet = new RRuleSet();
+    ruleSet.rrule(rule);
+
+    return ruleSet.toString();
+};
+
+export const excludeADateFromRrule = (
+    rruleString: string,
+    date: Date,
+    timezone: string = "Asia/Ho_Chi_Minh",
+) => {
+    const rule = rrulestr(rruleString, {
+        cache: true,
+    });
+
+    const zonedDate = toZonedTime(date, timezone);
+
+    const floatingDate = datetime(
+        zonedDate.getFullYear(),
+        zonedDate.getMonth() + 1,
+        zonedDate.getDate(),
+        zonedDate.getHours(),
+        zonedDate.getMinutes(),
+        zonedDate.getSeconds(),
+    );
+
+    const ruleSet = new RRuleSet();
+    ruleSet.rrule(rule);
+    ruleSet.exdate(floatingDate);
+
+    return ruleSet.toString();
+};
+
+export const setEndDateForRrule = (
+    rruleString: string,
+    date: Date,
+    timezone: string = "Asia/Ho_Chi_Minh",
+) => {
+    const rule = rrulestr(rruleString, {
+        cache: true,
+    });
+
+    const zonedDate = toZonedTime(date, timezone);
+
+    const floatingDate = datetime(
+        zonedDate.getFullYear(),
+        zonedDate.getMonth() + 1,
+        zonedDate.getDate(),
+        zonedDate.getHours(),
+        zonedDate.getMinutes(),
+        zonedDate.getSeconds(),
+    );
+
+    const ruleSet = new RRuleSet();
+    ruleSet.rrule(new RRule({ ...rule.options, until: floatingDate }));
+
+    return ruleSet.toString();
 };

@@ -34,9 +34,10 @@ const EventList = ({ date }: { date: Date }) => {
         return events
             .filter(
                 (e) =>
-                    isThisEventStartInTimeRange(e, startBound, endBound) ||
-                    (isThisEventStartBefore(e, startBound) &&
-                        isThisEventFinishedAfter(e, startBound)),
+                    (!e.rruleString || e.id.split("_").length > 1) &&
+                    (isThisEventStartInTimeRange(e, startBound, endBound) ||
+                        (isThisEventStartBefore(e, startBound) &&
+                            isThisEventFinishedAfter(e, startBound))),
             )
             .sort(
                 (e1, e2) => Number(e1.startDateTime) - Number(e2.startDateTime),

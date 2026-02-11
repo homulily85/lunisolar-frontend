@@ -211,15 +211,17 @@ export const getEvents = async (startRange: Date, endRange: Date) => {
 };
 
 export const deleteEvent = async (event: EventFromServer) => {
+    const actualId = event.id.split("_")[0];
+
     const result = await client.mutate<
         { deleteEvent: string },
         { eventId: string }
     >({
         mutation: DELETE_EVENT,
-        variables: { eventId: event.id },
+        variables: { eventId: actualId },
         update: (cache) => {
             const normalizedId = cache.identify({
-                id: event.id,
+                id: actualId,
                 __typename: "EventFromServer",
             });
 
