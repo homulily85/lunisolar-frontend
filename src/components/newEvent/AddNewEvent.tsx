@@ -11,7 +11,13 @@ import {
 } from "@headlessui/react";
 import { useAppDispatch, useAppSelector } from "../../hook.ts";
 import { setShowAddEventDialog } from "../../reducers/uiReducer.ts";
-import { Fragment, useCallback, useEffect, useState } from "react";
+import {
+    type ChangeEvent,
+    Fragment,
+    useCallback,
+    useEffect,
+    useState,
+} from "react";
 import TimePicker from "./TimePicker.tsx";
 import DatePicker from "./DatePicker.tsx";
 import { mdiChevronDown, mdiDelete, mdiPlus } from "@mdi/js";
@@ -19,7 +25,7 @@ import Icon from "@mdi/react";
 import { toast } from "react-toastify";
 import { z } from "zod";
 import type { Option } from "../../type.ts";
-import { frequency, reminderTime } from "../../utils/misc.ts";
+import { frequency, reminderTime, repeatLimits } from "../../utils/misc.ts";
 import { addNewEvent } from "../../services/eventService.ts";
 import { addEvent } from "../../reducers/eventsReducer.ts";
 import { createRruleString } from "../../utils/events.ts";
@@ -47,6 +53,12 @@ const AddNewEvent = () => {
 
     const [selectedRepeat, setSelectedRepeat] = useState<Option>(frequency[0]);
 
+    const [repeatLimit, setRepeatLimit] = useState<Option>(repeatLimits[0]);
+
+    const [numOccurrence, setNumOccurrence] = useState<number | string>(1);
+
+    const [untilDate, setUntilDate] = useState<Date>(new Date(selectedTs));
+
     const [description, setDescription] = useState("");
 
     const [selectedReminders, setSelectedReminders] = useState<
@@ -61,6 +73,8 @@ const AddNewEvent = () => {
         setLocation("");
         setIsAllDay(false);
         setSelectedRepeat(frequency[0]);
+        setRepeatLimit(repeatLimits[0]);
+        setNumOccurrence(1);
         setSelectedReminders([]);
         setDescription("");
         setSelectedStartTime("00:00");
@@ -103,10 +117,27 @@ const AddNewEvent = () => {
         [selectedReminders],
     );
 
+    const handleChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
+        const val = e.target.value;
+
+        if (val === "") {
+            setNumOccurrence("");
+        } else {
+            setNumOccurrence(Number(val));
+        }
+    }, []);
+
+    const handleBlur = useCallback(() => {
+        if (numOccurrence === "" || Number(numOccurrence) < 1) {
+            setNumOccurrence(1);
+        }
+    }, [numOccurrence]);
+
     useEffect(() => {
         // eslint-disable-next-line react-hooks/set-state-in-effect
         setSelectedStartDate(new Date(selectedTs));
         setSelectedEndDate(new Date(selectedTs));
+        setUntilDate(new Date(selectedTs));
     }, [selectedTs]);
 
     const saveNewEvent = async () => {
@@ -166,6 +197,33 @@ const AddNewEvent = () => {
             }
         }
 
+        let rruleString = "";
+
+        if (repeatLimit.key === "none") {
+            rruleString = createRruleString(selectedRepeat.key, startDateTime);
+        } else if (repeatLimit.key === "untilDate") {
+            if (untilDate < startDateTime) {
+                toast.error("Ngày kết thúc lặp phải sau ngày bắt đầu!");
+                return;
+            }
+            rruleString = createRruleString(selectedRepeat.key, startDateTime, {
+                untilDate,
+            });
+        } else if (repeatLimit.key === "numOccurrence") {
+            const num =
+                typeof numOccurrence === "string"
+                    ? Number(numOccurrence)
+                    : numOccurrence;
+
+            if (num < 1) {
+                toast.error("Số lần lặp phải lớn hơn 0!");
+                return;
+            }
+            rruleString = createRruleString(selectedRepeat.key, startDateTime, {
+                numOccurrence: num,
+            });
+        }
+
         try {
             const eventId = await addNewEvent({
                 title: title.trim(),
@@ -177,10 +235,7 @@ const AddNewEvent = () => {
                 reminder: selectedReminders
                     .filter((r) => r !== null)
                     .map((r) => r.key),
-                rruleString: createRruleString(
-                    selectedRepeat.key,
-                    startDateTime,
-                ),
+                rruleString: rruleString,
             });
 
             dispatch(
@@ -195,10 +250,7 @@ const AddNewEvent = () => {
                     reminder: selectedReminders
                         .filter((r) => r !== null)
                         .map((r) => r.key),
-                    rruleString: createRruleString(
-                        selectedRepeat.key,
-                        startDateTime,
-                    ),
+                    rruleString: rruleString,
                 }),
             );
 
@@ -350,6 +402,71 @@ const AddNewEvent = () => {
                                         ))}
                                     </ListboxOptions>
                                 </Listbox>
+
+                                {selectedRepeat &&
+                                    selectedRepeat.key !== "none" && (
+                                        <>
+                                            <label className='self-center'>
+                                                Giới hạn lặp
+                                            </label>
+                                            <Listbox
+                                                value={repeatLimit}
+                                                onChange={setRepeatLimit}>
+                                                <ListboxButton className='relative block w-full py-1.5 pr-8 pl-1 text-left border-b border-b-orange-300 focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-white/25'>
+                                                    {repeatLimit.value}
+                                                    <Icon
+                                                        className='group pointer-events-none absolute top-2.5 right-2.5'
+                                                        path={mdiChevronDown}
+                                                        size={1}
+                                                    />
+                                                </ListboxButton>
+                                                <ListboxOptions
+                                                    anchor='bottom'
+                                                    className='w-(--button-width) border border-white/5 bg-gray-100 dark:bg-gray-700 [--anchor-gap:--spacing(1)] focus:outline-none'>
+                                                    {repeatLimits.map((f) => (
+                                                        <ListboxOption
+                                                            key={f.key}
+                                                            value={f}
+                                                            className='group flex cursor-default items-center gap-2 rounded-lg px-3 py-1.5 select-none data-focus:bg-gray-200 dark:data-focus:bg-gray-600'>
+                                                            {f.value}
+                                                        </ListboxOption>
+                                                    ))}
+                                                </ListboxOptions>
+                                            </Listbox>
+                                        </>
+                                    )}
+                                {selectedRepeat &&
+                                    selectedRepeat.key !== "none" &&
+                                    repeatLimit.key === "untilDate" && (
+                                        <>
+                                            <label className='self-center'>
+                                                Đến ngày
+                                            </label>
+                                            <DatePicker
+                                                value={untilDate}
+                                                setValue={setUntilDate}
+                                            />
+                                        </>
+                                    )}
+
+                                {selectedRepeat &&
+                                    selectedRepeat.key !== "none" &&
+                                    repeatLimit.key === "numOccurrence" && (
+                                        <>
+                                            <label className='self-center'>
+                                                Số lần lặp
+                                            </label>
+
+                                            <input
+                                                type='number'
+                                                min={1}
+                                                value={numOccurrence}
+                                                onChange={handleChange}
+                                                onBlur={handleBlur}
+                                                className='w-full border border-gray-300 rounded px-3 py-1.5 focus:outline-none focus:border-orange-300 dark:border-gray-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none'
+                                            />
+                                        </>
+                                    )}
                             </div>
                         </fieldset>
 

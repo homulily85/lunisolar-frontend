@@ -25,14 +25,19 @@ const DeleteEventDialog = () => {
     );
 
     const eventsList = useAppSelector((state) => state.events);
+    const eventTobeDeleted = useAppSelector(
+        (state) => state.ui.eventTobeDeleted,
+    ) as EventFromServer | undefined;
+
+    const recurrenceCount = useMemo(() => {
+        return eventsList.filter(
+            (e) => e.id.split("_")[0] === eventTobeDeleted?.id?.split("_")[0],
+        ).length;
+    }, [eventTobeDeleted?.id, eventsList]);
 
     const closeDialog = useCallback(() => {
         dispatch(setShowDeleteOptionDialog(false));
     }, [dispatch]);
-
-    const eventTobeDeleted = useAppSelector(
-        (state) => state.ui.eventTobeDeleted,
-    ) as EventFromServer | undefined;
 
     // Normalize current date to timestamp to avoid repeated conversions
     const currentTs = useMemo(() => {
@@ -133,7 +138,7 @@ const DeleteEventDialog = () => {
         [currentTs, dispatch, eventTobeDeleted, eventsList, prepareAndUpdate],
     );
 
-    if (!eventTobeDeleted?.rruleString) {
+    if (!eventTobeDeleted?.rruleString || recurrenceCount <= 2) {
         return (
             <Dialog
                 open={showDialog}

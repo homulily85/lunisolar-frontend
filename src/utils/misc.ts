@@ -84,6 +84,12 @@ export const frequency: Option[] = [
     { key: "every-year", value: "Hàng năm" },
 ];
 
+export const repeatLimits: Option[] = [
+    { key: "none", value: "Không" },
+    { key: "untilDate", value: "Đến ngày" },
+    { key: "numOccurrence", value: "Số lần lặp" },
+];
+
 export const getFrequencyOptionFromRRule = (
     rruleString: string | null | undefined,
 ): Option => {

@@ -82,28 +82,47 @@ export const expandEvent = (
 export const createRruleString = (
     frequency: string,
     startDate: Date,
-    timezone: string = "Asia/Ho_Chi_Minh",
+    option?: { timezone?: string; numOccurrence?: number; untilDate?: Date },
 ): string => {
+    const timezone = option?.timezone || "Asia/Ho_Chi_Minh";
+
     if (!startDate || isNaN(startDate.getTime())) return "";
 
     const opts = FREQUENCY_OPTIONS[frequency];
     if (!opts) return "";
 
-    const zonedDate = toZonedTime(startDate, timezone);
+    const zonedStartDate = toZonedTime(startDate, timezone);
 
-    const floatingDate = datetime(
-        zonedDate.getFullYear(),
-        zonedDate.getMonth() + 1,
-        zonedDate.getDate(),
-        zonedDate.getHours(),
-        zonedDate.getMinutes(),
-        zonedDate.getSeconds(),
+    const floatingStartDate = datetime(
+        zonedStartDate.getFullYear(),
+        zonedStartDate.getMonth() + 1,
+        zonedStartDate.getDate(),
+        zonedStartDate.getHours(),
+        zonedStartDate.getMinutes(),
+        zonedStartDate.getSeconds(),
     );
+
+    const zonedUntilDate = option?.untilDate
+        ? toZonedTime(option.untilDate, timezone)
+        : undefined;
+
+    const floatingUntilDate = zonedUntilDate
+        ? datetime(
+              zonedUntilDate.getFullYear(),
+              zonedUntilDate.getMonth() + 1,
+              zonedUntilDate.getDate(),
+              zonedUntilDate.getHours(),
+              zonedUntilDate.getMinutes(),
+              zonedUntilDate.getSeconds(),
+          )
+        : undefined;
 
     const rule = new RRule({
         ...opts,
-        dtstart: floatingDate,
+        dtstart: floatingStartDate,
         tzid: timezone,
+        count: option?.numOccurrence,
+        until: floatingUntilDate,
     });
 
     const ruleSet = new RRuleSet();
