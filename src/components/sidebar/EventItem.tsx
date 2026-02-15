@@ -8,15 +8,22 @@ import Icon from "@mdi/react";
 import { mdiDelete, mdiInformation } from "@mdi/js";
 import {
     setEventTobeDeleted,
+    setEventToShowDetail,
     setShowDeleteOptionDialog,
+    setShowEventDetailDialog,
 } from "../../reducers/uiReducer.ts";
 
 const EventItem = ({ event }: { event: EventFromServer }) => {
     const label = `${event.title}\n${formatDateTime(new Date(event.startDateTime))} - ${formatDateTime(new Date(event.endDateTime))}`;
     const dispatch = useAppDispatch();
     const handleDelete = useCallback(() => {
-        dispatch(setShowDeleteOptionDialog(true));
         dispatch(setEventTobeDeleted(event));
+        dispatch(setShowDeleteOptionDialog(true));
+    }, [dispatch, event]);
+
+    const handleShowDetail = useCallback(() => {
+        dispatch(setEventToShowDetail(event));
+        dispatch(setShowEventDetailDialog(true));
     }, [dispatch, event]);
 
     return (
@@ -53,6 +60,7 @@ const EventItem = ({ event }: { event: EventFromServer }) => {
                         </p>
 
                         <button
+                            onClick={handleShowDetail}
                             aria-label='Chi tiết sự kiện'
                             title='Chi tiết sự kiện'
                             className='hover:cursor-pointer dark:hover:bg-gray-600  hover:bg-gray-100 rounded-md'>

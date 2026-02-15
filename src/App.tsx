@@ -16,6 +16,7 @@ import { CombinedGraphQLErrors } from "@apollo/client";
 import { getAccessToken } from "./services/authenticationService.ts";
 import { decodeAccessToken } from "./utils/misc.ts";
 import DeleteEventDialog from "./components/DeleteEventDialog.tsx";
+import ShowEventDetailDialog from "./components/ShowEventDetailDialog.tsx";
 
 const App = () => {
     const [theme, setTheme] = useState<"light" | "dark">(() =>
@@ -79,6 +80,7 @@ const App = () => {
             </div>
             <AddNewEvent />
             <DeleteEventDialog />
+            <ShowEventDetailDialog />
             <ToastContainer
                 theme={theme}
                 position='top-right'

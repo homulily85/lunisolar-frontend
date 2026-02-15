@@ -5,7 +5,9 @@ const uiSlice = createSlice({
     initialState: {
         showAddEventDialog: false,
         showDeleteOptionDialog: false,
+        showEventDetailDialog: false,
         eventTobeDeleted: {},
+        eventToShowDetail: {},
     },
     reducers: {
         setShowAddEventDialog(state, action) {
@@ -17,6 +19,12 @@ const uiSlice = createSlice({
         setEventTobeDeleted(state, action) {
             state.eventTobeDeleted = action.payload;
         },
+        setShowEventDetailDialog(state, action) {
+            state.showEventDetailDialog = action.payload;
+        },
+        setEventToShowDetail(state, action) {
+            state.eventToShowDetail = action.payload;
+        },
     },
 });
 
@@ -25,4 +33,6 @@ export const {
     setShowAddEventDialog,
     setShowDeleteOptionDialog,
     setEventTobeDeleted,
+    setShowEventDetailDialog,
+    setEventToShowDetail,
 } = uiSlice.actions;
