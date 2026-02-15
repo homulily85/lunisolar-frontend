@@ -20,6 +20,12 @@ import { toast } from "react-toastify";
 import { GoogleLogin, GoogleOAuthProvider } from "@react-oauth/google";
 import { OAUTH_CLIENT_ID } from "../config.ts";
 
+import {
+    addFCMToken,
+    removeFCMToken,
+    requestFCMToken,
+} from "../services/notificationService.ts";
+
 const ICON_SIZE = 1.25;
 
 const NavBar = () => {
@@ -38,6 +44,11 @@ const NavBar = () => {
         dispatch(setName(""));
         dispatch(setId(""));
         dispatch(setProfilePictureLink(""));
+        const fcmToken = localStorage.getItem("fcmToken");
+        if (fcmToken) {
+            await removeFCMToken(fcmToken);
+            localStorage.removeItem("fcmToken");
+        }
         await logout();
     }, [dispatch]);
     const selectedDate = useMemo(() => new Date(selectedTs), [selectedTs]);
@@ -104,6 +115,11 @@ const NavBar = () => {
     const handleSuccess = useCallback(
         async (credentialResponse: { credential?: string | undefined }) => {
             await getUserInfo(credentialResponse?.credential);
+            const fcmToken = await requestFCMToken();
+            if (fcmToken) {
+                localStorage.setItem("fcmToken", fcmToken);
+                await addFCMToken(fcmToken);
+            }
         },
         [getUserInfo],
     );

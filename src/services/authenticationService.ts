@@ -13,14 +13,25 @@ export const auth = async (credential: string) => {
     return authResult.data?.auth === "success";
 };
 
-export const getAccessToken = async () => {
-    const getAccessTokenResult = await client.mutate<{
-        refreshAccessToken: string | null;
-    }>({
-        mutation: REFRESH_ACCESS_TOKEN,
-    });
+export const getAccessToken = async (): Promise<string | null> => {
+    try {
+        const response = await fetch("/api/graphql", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            credentials: "same-origin",
+            body: JSON.stringify({
+                query: REFRESH_ACCESS_TOKEN,
+            }),
+        });
 
-    return getAccessTokenResult.data?.refreshAccessToken;
+        const result = await response.json();
+        return result.data?.refreshAccessToken || null;
+    } catch (error) {
+        console.error("Error fetching new access token:", error);
+        throw error;
+    }
 };
 
 export const logout = async () => {

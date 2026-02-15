@@ -18,6 +18,11 @@ import { decodeAccessToken } from "./utils/misc.ts";
 import DeleteEventDialog from "./components/dialog/DeleteEventDialog.tsx";
 import ShowEventDetailDialog from "./components/dialog/ShowEventDetailDialog.tsx";
 
+import {
+    addFCMToken,
+    requestFCMToken,
+} from "./services/notificationService.ts";
+
 const App = () => {
     const [theme, setTheme] = useState<"light" | "dark">(() =>
         window.matchMedia("(prefers-color-scheme: dark)").matches
@@ -43,7 +48,6 @@ const App = () => {
         (async () => {
             try {
                 const accessToken = await getAccessToken();
-
                 if (!accessToken) {
                     console.log("invalid credentials");
                     return;
@@ -55,6 +59,15 @@ const App = () => {
                 dispatch(setId(payload.id));
                 dispatch(setName(payload.name));
                 dispatch(setProfilePictureLink(payload.profilePictureLink));
+
+                let fcmToken = localStorage.getItem("fcmToken");
+                if (!fcmToken) {
+                    fcmToken = await requestFCMToken();
+                    if (fcmToken) {
+                        localStorage.setItem("fcmToken", fcmToken);
+                        await addFCMToken(fcmToken);
+                    }
+                }
             } catch (e) {
                 if (e instanceof CombinedGraphQLErrors) {
                     return;

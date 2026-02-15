@@ -23,7 +23,6 @@ const errorLink = new ErrorLink(({ error, operation, forward }) => {
                     if (!newToken) {
                         throw new Error("No token returned");
                     }
-
                     store.dispatch(setAccessToken(newToken));
 
                     const oldHeaders = operation.getContext().headers;
@@ -42,12 +41,13 @@ const errorLink = new ErrorLink(({ error, operation, forward }) => {
 
                     forward(operation).subscribe(subscriber);
                 })
-                .catch(() => {
+                .catch((err) => {
                     store.dispatch(setAccessToken(""));
+                    observer.error(err);
                 });
         });
     } else {
-        console.error(`[Error]: ${error}`);
+        console.error(`[GraphQL Error]:`, error);
     }
 });
 

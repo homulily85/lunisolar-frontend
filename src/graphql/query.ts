@@ -6,7 +6,7 @@ export const AUTH = gql`
     }
 `;
 
-export const REFRESH_ACCESS_TOKEN = gql`
+export const REFRESH_ACCESS_TOKEN = `
     mutation {
         refreshAccessToken
     }
@@ -69,5 +69,17 @@ export const UPDATE_EVENT = gql`
             description
             reminder
         }
+    }
+`;
+
+export const ADD_FCM_TOKEN = gql`
+    mutation ($fcmToken: String!) {
+        addFcmToken(token: $fcmToken)
+    }
+`;
+
+export const REMOVE_FCM_TOKEN = gql`
+    mutation ($fcmToken: String!) {
+        removeFcmToken(token: $fcmToken)
     }
 `;
