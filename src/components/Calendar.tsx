@@ -5,17 +5,17 @@ import {
     useRef,
     type WheelEvent,
 } from "react";
-import { useAppDispatch, useAppSelector } from "../../hook.ts";
+import { useAppDispatch, useAppSelector } from "../hook.ts";
 import { LunarCalendar } from "@dqcai/vn-lunar";
-import { setCurrentSelectedSolarDate } from "../../reducers/dateReducer.ts";
-import type { DayInfo, EventFromServer } from "../../type.ts";
-import DayCell from "./DayCell.tsx";
-import { getEvents } from "../../services/eventService.ts";
+import { setCurrentSelectedSolarDate } from "../reducers/dateReducer.ts";
+import type { DayInfo, EventFromServer } from "../type.ts";
+import DayCell from "./misc/DayCell.tsx";
+import { getEvents } from "../services/eventService.ts";
 import { toast } from "react-toastify";
-import { setEvents } from "../../reducers/eventsReducer.ts";
+import { setEvents } from "../reducers/eventsReducer.ts";
 
-import { isSameDate } from "../../utils/misc.ts";
-import { expandEvent } from "../../utils/events.ts";
+import { isSameDate } from "../utils/misc.ts";
+import { expandEvent } from "../utils/events.ts";
 
 const WEEK_DAYS = [
     "Chủ Nhật",

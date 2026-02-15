@@ -4,15 +4,15 @@ import {
     DialogPanel,
     DialogTitle,
 } from "@headlessui/react";
-import { useAppDispatch, useAppSelector } from "../hook.ts";
-import { setShowEventDetailDialog } from "../reducers/uiReducer.ts";
+import { useAppDispatch, useAppSelector } from "../../hook.ts";
+import { setShowEventDetailDialog } from "../../reducers/uiReducer.ts";
 import { useCallback, useMemo } from "react";
-import type { EventFromServer } from "../type.ts";
+import type { EventFromServer } from "../../type.ts";
+import { formatDateTime } from "../../utils/misc.ts";
 import {
-    formatDateTime,
     getRecurrenceOptionFromRRule,
     getReminderOptionsFromKeys,
-} from "../utils/misc.ts";
+} from "../../utils/events.ts";
 
 const ShowEventDetailDialog = () => {
     const showDialog = useAppSelector(

@@ -18,8 +18,8 @@ import {
     useEffect,
     useState,
 } from "react";
-import TimePicker from "./TimePicker.tsx";
-import DatePicker from "./DatePicker.tsx";
+import TimePicker from "../picker/TimePicker.tsx";
+import DatePicker from "../picker/DatePicker.tsx";
 import { mdiChevronDown, mdiDelete, mdiPlus } from "@mdi/js";
 import Icon from "@mdi/react";
 import { toast } from "react-toastify";
@@ -35,7 +35,7 @@ const EMPTY_REMINDER: Option = {
     value: "Chọn thời điểm",
 };
 
-const AddNewEvent = () => {
+const AddNewEventDialog = () => {
     const selectedTs = useAppSelector((s) => s.date.currentSelectedSolarDate);
     const [title, setTitle] = useState("");
     const [location, setLocation] = useState("");
@@ -567,4 +567,4 @@ const AddNewEvent = () => {
     );
 };
 
-export default AddNewEvent;
+export default AddNewEventDialog;

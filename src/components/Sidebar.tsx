@@ -1,11 +1,11 @@
 import { useMemo } from "react";
 import Icon from "@mdi/react";
 import { mdiPlus } from "@mdi/js";
-import { useAppDispatch, useAppSelector } from "../../hook.ts";
-import { setShowAddEventDialog } from "../../reducers/uiReducer.ts";
+import { useAppDispatch, useAppSelector } from "../hook.ts";
+import { setShowAddEventDialog } from "../reducers/uiReducer.ts";
 import { LunarCalendar } from "@dqcai/vn-lunar";
-import { monthNames } from "../../utils/misc.ts";
-import EventList from "./EventList.tsx";
+import { monthNames } from "../utils/misc.ts";
+import EventList from "./misc/EventList.tsx";
 
 const Sidebar = () => {
     const accessToken = useAppSelector((state) => state.user.accessToken);

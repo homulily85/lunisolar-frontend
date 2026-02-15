@@ -1,5 +1,6 @@
-import { type EventFromServer } from "../type.ts";
+import { type EventFromServer, type Option } from "../type.ts";
 import { datetime, RRule, RRuleSet, rrulestr } from "rrule";
+import { frequency, reminderTime, repeatLimits } from "./misc.ts";
 
 const FREQUENCY_OPTIONS: Record<string, unknown> = {
     none: undefined,
@@ -162,4 +163,72 @@ export const setEndDateForRrule = (rruleString: string, date: Date) => {
     ruleSet.rrule(new RRule({ ...rule.options, until: floatingDate }));
 
     return ruleSet.toString();
+};
+
+export const getReminderOptionsFromKeys = (
+    keys: string[] | undefined,
+): (Option | null)[] => {
+    return keys
+        ? keys.map((key) => {
+              const foundOption = reminderTime.find((opt) => opt.key === key);
+              return foundOption || null;
+          })
+        : [];
+};
+
+export const getRecurrenceOptionFromRRule = (
+    rruleString: string | null | undefined,
+): {
+    freq: Option;
+    repeatLimit: Option;
+    numOccurrence?: number;
+    untilDate?: Date;
+} => {
+    let detectedKey = "none";
+
+    if (rruleString) {
+        try {
+            const options = RRule.parseString(rruleString);
+            const freq = options.freq;
+            const interval = options.interval || 1;
+
+            if (freq === RRule.DAILY && interval === 1)
+                detectedKey = "everyday";
+            else if (freq === RRule.WEEKLY && interval === 1)
+                detectedKey = "everyweek";
+            else if (freq === RRule.WEEKLY && interval === 2)
+                detectedKey = "every-two-weeks";
+            else if (freq === RRule.MONTHLY && interval === 1)
+                detectedKey = "every-month";
+            else if (freq === RRule.YEARLY && interval === 1)
+                detectedKey = "every-year";
+
+            const until = options.until ? new Date(options.until) : undefined;
+            if (until) {
+                // See explanation in expandEvent function in events.ts for why we need to subtract 7 hours here
+                until.setHours(until.getHours() - 7);
+            }
+
+            const count = options.count || undefined;
+
+            return {
+                freq:
+                    frequency.find((f) => f.key === detectedKey) ||
+                    frequency[0],
+                repeatLimit: until
+                    ? repeatLimits.find((opt) => opt.key === "untilDate")!
+                    : count
+                      ? repeatLimits.find((opt) => opt.key === "numOccurrence")!
+                      : repeatLimits[0],
+                untilDate: until,
+                numOccurrence: count,
+            };
+        } catch (e) {
+            console.error("RRule parse error", e);
+        }
+    }
+    return {
+        freq: frequency[0],
+        repeatLimit: repeatLimits[0],
+    };
 };

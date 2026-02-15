@@ -1,7 +1,7 @@
-import Calendar from "./components/calendar/Calendar";
-import Sidebar from "./components/sidebar/Sidebar.tsx";
+import Calendar from "./components/Calendar.tsx";
+import Sidebar from "./components/Sidebar.tsx";
 import NavBar from "./components/NavBar";
-import AddNewEvent from "./components/newEvent/AddNewEvent";
+import AddNewEventDialog from "./components/dialog/AddNewEventDialog.tsx";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useEffect, useRef, useState } from "react";
@@ -15,8 +15,8 @@ import { useAppDispatch } from "./hook";
 import { CombinedGraphQLErrors } from "@apollo/client";
 import { getAccessToken } from "./services/authenticationService.ts";
 import { decodeAccessToken } from "./utils/misc.ts";
-import DeleteEventDialog from "./components/DeleteEventDialog.tsx";
-import ShowEventDetailDialog from "./components/ShowEventDetailDialog.tsx";
+import DeleteEventDialog from "./components/dialog/DeleteEventDialog.tsx";
+import ShowEventDetailDialog from "./components/dialog/ShowEventDetailDialog.tsx";
 
 const App = () => {
     const [theme, setTheme] = useState<"light" | "dark">(() =>
@@ -78,7 +78,7 @@ const App = () => {
             <div className='h-full min-h-0'>
                 <Calendar />
             </div>
-            <AddNewEvent />
+            <AddNewEventDialog />
             <DeleteEventDialog />
             <ShowEventDetailDialog />
             <ToastContainer

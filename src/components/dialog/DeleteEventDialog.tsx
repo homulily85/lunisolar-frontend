@@ -6,14 +6,17 @@ import {
     DialogTitle,
 } from "@headlessui/react";
 import { useCallback, useMemo } from "react";
-import { setShowDeleteOptionDialog } from "../reducers/uiReducer.ts";
-import { useAppDispatch, useAppSelector } from "../hook.ts";
-import { deleteOptions } from "../utils/misc.ts";
-import { deleteEvent, updateAnEvent } from "../services/eventService.ts";
-import type { EventFromServer } from "../type.ts";
+import { setShowDeleteOptionDialog } from "../../reducers/uiReducer.ts";
+import { useAppDispatch, useAppSelector } from "../../hook.ts";
+import { deleteOptions } from "../../utils/misc.ts";
+import { deleteEvent, updateAnEvent } from "../../services/eventService.ts";
+import type { EventFromServer } from "../../type.ts";
 import { toast } from "react-toastify";
-import { removeEvent, updateEvent } from "../reducers/eventsReducer.ts";
-import { excludeADateFromRrule, setEndDateForRrule } from "../utils/events.ts";
+import { removeEvent, updateEvent } from "../../reducers/eventsReducer.ts";
+import {
+    excludeADateFromRrule,
+    setEndDateForRrule,
+} from "../../utils/events.ts";
 
 const DeleteEventDialog = () => {
     const dispatch = useAppDispatch();

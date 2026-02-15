@@ -1,4 +1,3 @@
-import { RRule } from "rrule";
 import { jwtDecode } from "jwt-decode";
 import type { AccessTokenPayload, Option } from "../type.ts";
 
@@ -52,17 +51,6 @@ export const reminderTime: Option[] = [
     { key: "1-month", value: "Trước 1 tháng" },
 ];
 
-export const getReminderOptionsFromKeys = (
-    keys: string[] | undefined,
-): (Option | null)[] => {
-    return keys
-        ? keys.map((key) => {
-              const foundOption = reminderTime.find((opt) => opt.key === key);
-              return foundOption || null;
-          })
-        : [];
-};
-
 export const timesToPick = () => {
     const res: string[] = [];
     for (let hour = 0; hour < 24; hour++) {
@@ -90,63 +78,6 @@ export const repeatLimits: Option[] = [
     { key: "numOccurrence", value: "Số lần lặp" },
 ];
 
-export const getRecurrenceOptionFromRRule = (
-    rruleString: string | null | undefined,
-): {
-    freq: Option;
-    repeatLimit: Option;
-    numOccurrence?: number;
-    untilDate?: Date;
-} => {
-    let detectedKey = "none";
-
-    if (rruleString) {
-        try {
-            const options = RRule.parseString(rruleString);
-            const freq = options.freq;
-            const interval = options.interval || 1;
-
-            if (freq === RRule.DAILY && interval === 1)
-                detectedKey = "everyday";
-            else if (freq === RRule.WEEKLY && interval === 1)
-                detectedKey = "everyweek";
-            else if (freq === RRule.WEEKLY && interval === 2)
-                detectedKey = "every-two-weeks";
-            else if (freq === RRule.MONTHLY && interval === 1)
-                detectedKey = "every-month";
-            else if (freq === RRule.YEARLY && interval === 1)
-                detectedKey = "every-year";
-
-            const until = options.until ? new Date(options.until) : undefined;
-            if (until) {
-                // See explanation in expandEvent function in events.ts for why we need to subtract 7 hours here
-                until.setHours(until.getHours() - 7);
-            }
-
-            const count = options.count || undefined;
-
-            return {
-                freq:
-                    frequency.find((f) => f.key === detectedKey) ||
-                    frequency[0],
-                repeatLimit: until
-                    ? repeatLimits.find((opt) => opt.key === "untilDate")!
-                    : count
-                      ? repeatLimits.find((opt) => opt.key === "numOccurrence")!
-                      : repeatLimits[0],
-                untilDate: until,
-                numOccurrence: count,
-            };
-        } catch (e) {
-            console.error("RRule parse error", e);
-        }
-    }
-    return {
-        freq: frequency[0],
-        repeatLimit: repeatLimits[0],
-    };
-};
-
 export const deleteOptions: Option[] = [
     { key: "all", value: "Tất cả sự kiện" },
     {
@@ -155,13 +86,4 @@ export const deleteOptions: Option[] = [
     },
     { key: "current", value: "Chỉ sự kiện này" },
     { key: "cancel", value: "Hủy" },
-];
-
-export const updateOptions: Option[] = [
-    { key: "all", value: "Tất cả sự kiện" },
-    {
-        key: "subsequent",
-        value: "Sự kiện này và các sự kiện tiếp theo",
-    },
-    { key: "current", value: "Chỉ sự kiện này" },
 ];
