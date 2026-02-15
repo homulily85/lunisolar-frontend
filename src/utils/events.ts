@@ -1,6 +1,5 @@
 import { type EventFromServer } from "../type.ts";
 import { datetime, RRule, RRuleSet, rrulestr } from "rrule";
-import { toZonedTime } from "date-fns-tz";
 
 const FREQUENCY_OPTIONS: Record<string, unknown> = {
     none: undefined,
@@ -62,6 +61,8 @@ export const expandEvent = (
         const dates = rule.between(startRange, endRange, true);
         const instances = dates.map((date) => {
             const instance = { ...event };
+            // Even though the given offset is `Z` (UTC), these are local times, not UTC times.
+            // JS Date will parse them as UTC, so we need to subtract 7 hours to get the correct local time.
             date.setHours(date.getHours() - 7);
             instance.startDateTime = date.getTime();
             instance.endDateTime = new Date(
@@ -82,45 +83,36 @@ export const expandEvent = (
 export const createRruleString = (
     frequency: string,
     startDate: Date,
-    option?: { timezone?: string; numOccurrence?: number; untilDate?: Date },
+    option?: { numOccurrence?: number; untilDate?: Date },
 ): string => {
-    const timezone = option?.timezone || "Asia/Ho_Chi_Minh";
-
     if (!startDate || isNaN(startDate.getTime())) return "";
 
     const opts = FREQUENCY_OPTIONS[frequency];
     if (!opts) return "";
 
-    const zonedStartDate = toZonedTime(startDate, timezone);
-
     const floatingStartDate = datetime(
-        zonedStartDate.getFullYear(),
-        zonedStartDate.getMonth() + 1,
-        zonedStartDate.getDate(),
-        zonedStartDate.getHours(),
-        zonedStartDate.getMinutes(),
-        zonedStartDate.getSeconds(),
+        startDate.getFullYear(),
+        startDate.getMonth() + 1,
+        startDate.getDate(),
+        startDate.getHours(),
+        startDate.getMinutes(),
+        startDate.getSeconds(),
     );
 
-    const zonedUntilDate = option?.untilDate
-        ? toZonedTime(option.untilDate, timezone)
-        : undefined;
-
-    const floatingUntilDate = zonedUntilDate
+    const floatingUntilDate = option?.untilDate
         ? datetime(
-              zonedUntilDate.getFullYear(),
-              zonedUntilDate.getMonth() + 1,
-              zonedUntilDate.getDate(),
-              zonedUntilDate.getHours(),
-              zonedUntilDate.getMinutes(),
-              zonedUntilDate.getSeconds(),
+              option.untilDate.getFullYear(),
+              option.untilDate.getMonth() + 1,
+              option.untilDate.getDate(),
+              option.untilDate.getHours(),
+              option.untilDate.getMinutes(),
+              option.untilDate.getSeconds(),
           )
         : undefined;
 
     const rule = new RRule({
         ...opts,
         dtstart: floatingStartDate,
-        tzid: timezone,
         count: option?.numOccurrence,
         until: floatingUntilDate,
     });
@@ -131,24 +123,18 @@ export const createRruleString = (
     return ruleSet.toString();
 };
 
-export const excludeADateFromRrule = (
-    rruleString: string,
-    date: Date,
-    timezone: string = "Asia/Ho_Chi_Minh",
-) => {
+export const excludeADateFromRrule = (rruleString: string, date: Date) => {
     const rule = rrulestr(rruleString, {
         cache: true,
     });
 
-    const zonedDate = toZonedTime(date, timezone);
-
     const floatingDate = datetime(
-        zonedDate.getFullYear(),
-        zonedDate.getMonth() + 1,
-        zonedDate.getDate(),
-        zonedDate.getHours(),
-        zonedDate.getMinutes(),
-        zonedDate.getSeconds(),
+        date.getFullYear(),
+        date.getMonth() + 1,
+        date.getDate(),
+        date.getHours(),
+        date.getMinutes(),
+        date.getSeconds(),
     );
 
     const ruleSet = new RRuleSet();
@@ -158,24 +144,18 @@ export const excludeADateFromRrule = (
     return ruleSet.toString();
 };
 
-export const setEndDateForRrule = (
-    rruleString: string,
-    date: Date,
-    timezone: string = "Asia/Ho_Chi_Minh",
-) => {
+export const setEndDateForRrule = (rruleString: string, date: Date) => {
     const rule = rrulestr(rruleString, {
         cache: true,
     });
 
-    const zonedDate = toZonedTime(date, timezone);
-
     const floatingDate = datetime(
-        zonedDate.getFullYear(),
-        zonedDate.getMonth() + 1,
-        zonedDate.getDate(),
-        zonedDate.getHours(),
-        zonedDate.getMinutes(),
-        zonedDate.getSeconds(),
+        date.getFullYear(),
+        date.getMonth() + 1,
+        date.getDate(),
+        date.getHours(),
+        date.getMinutes(),
+        date.getSeconds(),
     );
 
     const ruleSet = new RRuleSet();

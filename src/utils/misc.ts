@@ -90,9 +90,14 @@ export const repeatLimits: Option[] = [
     { key: "numOccurrence", value: "Số lần lặp" },
 ];
 
-export const getFrequencyOptionFromRRule = (
+export const getRecurrenceOptionFromRRule = (
     rruleString: string | null | undefined,
-): Option => {
+): {
+    freq: Option;
+    repeatLimit: Option;
+    numOccurrence?: number;
+    untilDate?: Date;
+} => {
     let detectedKey = "none";
 
     if (rruleString) {
@@ -111,13 +116,35 @@ export const getFrequencyOptionFromRRule = (
                 detectedKey = "every-month";
             else if (freq === RRule.YEARLY && interval === 1)
                 detectedKey = "every-year";
+
+            const until = options.until ? new Date(options.until) : undefined;
+            if (until) {
+                // See explanation in expandEvent function in events.ts for why we need to subtract 7 hours here
+                until.setHours(until.getHours() - 7);
+            }
+
+            const count = options.count || undefined;
+
+            return {
+                freq:
+                    frequency.find((f) => f.key === detectedKey) ||
+                    frequency[0],
+                repeatLimit: until
+                    ? repeatLimits.find((opt) => opt.key === "untilDate")!
+                    : count
+                      ? repeatLimits.find((opt) => opt.key === "numOccurrence")!
+                      : repeatLimits[0],
+                untilDate: until,
+                numOccurrence: count,
+            };
         } catch (e) {
             console.error("RRule parse error", e);
         }
     }
-    const foundOption = frequency.find((f) => f.key === detectedKey);
-
-    return foundOption || frequency[0];
+    return {
+        freq: frequency[0],
+        repeatLimit: repeatLimits[0],
+    };
 };
 
 export const deleteOptions: Option[] = [

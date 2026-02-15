@@ -11,7 +11,14 @@ import {
 } from "@headlessui/react";
 import { useAppDispatch, useAppSelector } from "../hook.ts";
 import { setShowUpdateEventDialog } from "../reducers/uiReducer.ts";
-import { Fragment, useCallback, useEffect, useState } from "react";
+import {
+    type ChangeEvent,
+    Fragment,
+    useCallback,
+    useEffect,
+    useMemo,
+    useState,
+} from "react";
 import TimePicker from "./newEvent/TimePicker.tsx";
 import DatePicker from "./newEvent/DatePicker.tsx";
 import { mdiChevronDown, mdiDelete, mdiPlus } from "@mdi/js";
@@ -21,9 +28,10 @@ import { z } from "zod";
 import type { EventFromServer, Option } from "../type.ts";
 import {
     frequency,
-    getFrequencyOptionFromRRule,
+    getRecurrenceOptionFromRRule,
     getReminderOptionsFromKeys,
     reminderTime,
+    repeatLimits,
 } from "../utils/misc.ts";
 import { updateAnEvent } from "../services/eventService.ts";
 import { updateEvent } from "../reducers/eventsReducer.ts";
@@ -42,7 +50,7 @@ function formatTimeHHMM(input: Date | string | number): string {
 }
 
 const UpdateEvent = () => {
-    const event = useAppSelector(
+    const eventToBeModified = useAppSelector(
         (s) => s.ui.eventToBeModified as EventFromServer,
     );
 
@@ -50,57 +58,102 @@ const UpdateEvent = () => {
         (state) => state.ui.showUpdateEventDialog,
     );
 
-    const [title, setTitle] = useState(event.title);
+    const [title, setTitle] = useState(eventToBeModified.title);
 
-    const [location, setLocation] = useState(event.place);
+    const [location, setLocation] = useState(eventToBeModified.place);
 
-    const [isAllDay, setIsAllDay] = useState(event.isAllDay);
+    const [isAllDay, setIsAllDay] = useState(eventToBeModified.isAllDay);
 
     const [selectedStartDate, setSelectedStartDate] = useState<Date>(
-        new Date(event.startDateTime),
+        new Date(eventToBeModified.startDateTime),
     );
 
     const [selectedStartTime, setSelectedStartTime] = useState(
-        formatTimeHHMM(event.startDateTime),
+        formatTimeHHMM(eventToBeModified.startDateTime),
     );
 
     const [selectedEndDate, setSelectedEndDate] = useState<Date>(
-        new Date(event.endDateTime),
+        new Date(eventToBeModified.endDateTime),
     );
 
     const [selectedEndTime, setSelectedEndTime] = useState(
-        formatTimeHHMM(event.endDateTime),
+        formatTimeHHMM(eventToBeModified.endDateTime),
+    );
+
+    const rrulesOption = useMemo(
+        () => getRecurrenceOptionFromRRule(eventToBeModified.rruleString),
+        [eventToBeModified.rruleString],
     );
 
     const [selectedRepeat, setSelectedRepeat] = useState<Option>(
-        getFrequencyOptionFromRRule(event.rruleString),
+        rrulesOption.freq,
     );
 
-    const [description, setDescription] = useState(event.description);
+    const [repeatLimit, setRepeatLimit] = useState<Option>(
+        rrulesOption.repeatLimit,
+    );
+
+    const [numOccurrence, setNumOccurrence] = useState<number | string>(
+        rrulesOption.numOccurrence ?? 1,
+    );
+
+    const [untilDate, setUntilDate] = useState<Date>(
+        rrulesOption.untilDate ?? new Date(),
+    );
+
+    const [description, setDescription] = useState(
+        eventToBeModified.description,
+    );
 
     const [selectedReminders, setSelectedReminders] = useState<
         (Option | null)[]
-    >(getReminderOptionsFromKeys(event.reminder));
+    >(getReminderOptionsFromKeys(eventToBeModified.reminder));
 
     const dispatch = useAppDispatch();
 
+    const handleChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
+        const val = e.target.value;
+
+        if (val === "") {
+            setNumOccurrence("");
+        } else {
+            setNumOccurrence(Number(val));
+        }
+    }, []);
+
+    const handleBlur = useCallback(() => {
+        if (numOccurrence === "" || Number(numOccurrence) < 1) {
+            setNumOccurrence(1);
+        }
+    }, [numOccurrence]);
+
     const resetDialog = useCallback(() => {
-        setTitle(event.title);
-        setLocation(event.place);
-        setIsAllDay(event.isAllDay);
-        setSelectedRepeat(getFrequencyOptionFromRRule(event.rruleString));
-        setSelectedReminders(getReminderOptionsFromKeys(event.reminder));
-        setDescription(event.description);
-        setSelectedStartTime(formatTimeHHMM(event.endDateTime));
-        setSelectedEndTime(formatTimeHHMM(event.endDateTime));
+        const { repeatLimit, untilDate, freq, numOccurrence } =
+            getRecurrenceOptionFromRRule(eventToBeModified.rruleString);
+        setTitle(eventToBeModified.title);
+        setLocation(eventToBeModified.place);
+        setIsAllDay(eventToBeModified.isAllDay);
+        setSelectedRepeat(freq);
+        setRepeatLimit(repeatLimit);
+        setNumOccurrence(numOccurrence ?? 1);
+        setUntilDate(untilDate ?? new Date());
+        setSelectedReminders(
+            getReminderOptionsFromKeys(eventToBeModified.reminder),
+        );
+        setDescription(eventToBeModified.description);
+        setSelectedStartTime(formatTimeHHMM(eventToBeModified.startDateTime));
+        setSelectedEndTime(formatTimeHHMM(eventToBeModified.endDateTime));
+        setSelectedStartDate(new Date(eventToBeModified.startDateTime));
+        setSelectedEndDate(new Date(eventToBeModified.endDateTime));
     }, [
-        event.description,
-        event.endDateTime,
-        event.isAllDay,
-        event.place,
-        event.reminder,
-        event.rruleString,
-        event.title,
+        eventToBeModified.description,
+        eventToBeModified.endDateTime,
+        eventToBeModified.isAllDay,
+        eventToBeModified.place,
+        eventToBeModified.reminder,
+        eventToBeModified.rruleString,
+        eventToBeModified.startDateTime,
+        eventToBeModified.title,
     ]);
 
     const closeDialog = useCallback(() => {
@@ -141,25 +194,18 @@ const UpdateEvent = () => {
 
     useEffect(() => {
         // eslint-disable-next-line react-hooks/set-state-in-effect
-        setTitle(event.title);
-        setLocation(event.place);
-        setIsAllDay(event.isAllDay);
-        setSelectedRepeat(getFrequencyOptionFromRRule(event.rruleString));
-        setSelectedReminders(getReminderOptionsFromKeys(event.reminder));
-        setDescription(event.description);
-        setSelectedStartDate(new Date(event.startDateTime));
-        setSelectedEndDate(new Date(event.endDateTime));
-        setSelectedStartTime(formatTimeHHMM(event.startDateTime));
-        setSelectedEndTime(formatTimeHHMM(event.endDateTime));
+        resetDialog();
     }, [
-        event.description,
-        event.endDateTime,
-        event.isAllDay,
-        event.place,
-        event.reminder,
-        event.rruleString,
-        event.startDateTime,
-        event.title,
+        eventToBeModified,
+        eventToBeModified.description,
+        eventToBeModified.endDateTime,
+        eventToBeModified.isAllDay,
+        eventToBeModified.place,
+        eventToBeModified.reminder,
+        eventToBeModified.rruleString,
+        eventToBeModified.startDateTime,
+        eventToBeModified.title,
+        resetDialog,
     ]);
 
     const handleUpdate = async () => {
@@ -219,9 +265,38 @@ const UpdateEvent = () => {
             }
         }
 
+        let rruleString = "";
+
+        if (selectedRepeat.key === "none") {
+            rruleString = "";
+        } else if (repeatLimit.key === "none") {
+            rruleString = createRruleString(selectedRepeat.key, startDateTime);
+        } else if (repeatLimit.key === "untilDate") {
+            if (untilDate < startDateTime) {
+                toast.error("Ngày kết thúc lặp phải sau ngày bắt đầu!");
+                return;
+            }
+            rruleString = createRruleString(selectedRepeat.key, startDateTime, {
+                untilDate,
+            });
+        } else if (repeatLimit.key === "numOccurrence") {
+            const num =
+                typeof numOccurrence === "string"
+                    ? Number(numOccurrence)
+                    : numOccurrence;
+
+            if (num < 1) {
+                toast.error("Số lần lặp phải lớn hơn 0!");
+                return;
+            }
+            rruleString = createRruleString(selectedRepeat.key, startDateTime, {
+                numOccurrence: num,
+            });
+        }
+
         try {
             await updateAnEvent({
-                id: event.id.split("_")[0],
+                id: eventToBeModified.id.split("_")[0],
                 title: title.trim(),
                 place: location,
                 isAllDay: isAllDay,
@@ -231,15 +306,12 @@ const UpdateEvent = () => {
                 reminder: selectedReminders
                     .filter((r) => r !== null)
                     .map((r) => r.key),
-                rruleString: createRruleString(
-                    selectedRepeat.key,
-                    startDateTime,
-                ),
+                rruleString,
             });
 
             dispatch(
                 updateEvent({
-                    id: event.id.split("_")[0],
+                    id: eventToBeModified.id.split("_")[0],
                     title: title.trim(),
                     place: location,
                     isAllDay: isAllDay,
@@ -249,16 +321,13 @@ const UpdateEvent = () => {
                     reminder: selectedReminders
                         .filter((r) => r !== null)
                         .map((r) => r.key),
-                    rruleString: createRruleString(
-                        selectedRepeat.key,
-                        startDateTime,
-                    ),
+                    rruleString,
                 }),
             );
 
             closeDialog();
         } catch (e) {
-            toast.error("Có lỗi xảy ra khi tạo sự kiện mới");
+            toast.error("Có lỗi xảy ra khi cập nhật sự kiện!");
             console.log(e);
             return;
         }
@@ -404,6 +473,71 @@ const UpdateEvent = () => {
                                         ))}
                                     </ListboxOptions>
                                 </Listbox>
+
+                                {selectedRepeat &&
+                                    selectedRepeat.key !== "none" && (
+                                        <>
+                                            <label className='self-center'>
+                                                Giới hạn lặp
+                                            </label>
+                                            <Listbox
+                                                value={repeatLimit}
+                                                onChange={setRepeatLimit}>
+                                                <ListboxButton className='relative block w-full py-1.5 pr-8 pl-1 text-left border-b border-b-orange-300 focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-white/25'>
+                                                    {repeatLimit.value}
+                                                    <Icon
+                                                        className='group pointer-events-none absolute top-2.5 right-2.5'
+                                                        path={mdiChevronDown}
+                                                        size={1}
+                                                    />
+                                                </ListboxButton>
+                                                <ListboxOptions
+                                                    anchor='bottom'
+                                                    className='w-(--button-width) border border-white/5 bg-gray-100 dark:bg-gray-700 [--anchor-gap:--spacing(1)] focus:outline-none'>
+                                                    {repeatLimits.map((f) => (
+                                                        <ListboxOption
+                                                            key={f.key}
+                                                            value={f}
+                                                            className='group flex cursor-default items-center gap-2 rounded-lg px-3 py-1.5 select-none data-focus:bg-gray-200 dark:data-focus:bg-gray-600'>
+                                                            {f.value}
+                                                        </ListboxOption>
+                                                    ))}
+                                                </ListboxOptions>
+                                            </Listbox>
+                                        </>
+                                    )}
+                                {selectedRepeat &&
+                                    selectedRepeat.key !== "none" &&
+                                    repeatLimit.key === "untilDate" && (
+                                        <>
+                                            <label className='self-center'>
+                                                Đến ngày
+                                            </label>
+                                            <DatePicker
+                                                value={untilDate}
+                                                setValue={setUntilDate}
+                                            />
+                                        </>
+                                    )}
+
+                                {selectedRepeat &&
+                                    selectedRepeat.key !== "none" &&
+                                    repeatLimit.key === "numOccurrence" && (
+                                        <>
+                                            <label className='self-center'>
+                                                Số lần lặp
+                                            </label>
+
+                                            <input
+                                                type='number'
+                                                min={1}
+                                                value={numOccurrence}
+                                                onChange={handleChange}
+                                                onBlur={handleBlur}
+                                                className='w-full border border-gray-300 rounded px-3 py-1.5 focus:outline-none focus:border-orange-300 dark:border-gray-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none'
+                                            />
+                                        </>
+                                    )}
                             </div>
                         </fieldset>
 

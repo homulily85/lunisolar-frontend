@@ -79,7 +79,10 @@ const AddNewEvent = () => {
         setDescription("");
         setSelectedStartTime("00:00");
         setSelectedEndTime("00:00");
-    }, []);
+        setSelectedStartDate(new Date(selectedTs));
+        setSelectedEndDate(new Date(selectedTs));
+        setUntilDate(new Date(selectedTs));
+    }, [selectedTs]);
 
     const closeDialog = useCallback(() => {
         dispatch(setShowAddEventDialog(false));
@@ -199,7 +202,9 @@ const AddNewEvent = () => {
 
         let rruleString = "";
 
-        if (repeatLimit.key === "none") {
+        if (selectedRepeat.key === "none") {
+            rruleString = "";
+        } else if (repeatLimit.key === "none") {
             rruleString = createRruleString(selectedRepeat.key, startDateTime);
         } else if (repeatLimit.key === "untilDate") {
             if (untilDate < startDateTime) {
@@ -235,7 +240,7 @@ const AddNewEvent = () => {
                 reminder: selectedReminders
                     .filter((r) => r !== null)
                     .map((r) => r.key),
-                rruleString: rruleString,
+                rruleString,
             });
 
             dispatch(
@@ -250,7 +255,7 @@ const AddNewEvent = () => {
                     reminder: selectedReminders
                         .filter((r) => r !== null)
                         .map((r) => r.key),
-                    rruleString: rruleString,
+                    rruleString,
                 }),
             );
 
