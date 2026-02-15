@@ -156,3 +156,12 @@ export const deleteOptions: Option[] = [
     { key: "current", value: "Chỉ sự kiện này" },
     { key: "cancel", value: "Hủy" },
 ];
+
+export const updateOptions: Option[] = [
+    { key: "all", value: "Tất cả sự kiện" },
+    {
+        key: "subsequent",
+        value: "Sự kiện này và các sự kiện tiếp theo",
+    },
+    { key: "current", value: "Chỉ sự kiện này" },
+];

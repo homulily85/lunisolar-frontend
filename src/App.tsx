@@ -15,7 +15,6 @@ import { useAppDispatch } from "./hook";
 import { CombinedGraphQLErrors } from "@apollo/client";
 import { getAccessToken } from "./services/authenticationService.ts";
 import { decodeAccessToken } from "./utils/misc.ts";
-import UpdateEvent from "./components/UpdateEvent.tsx";
 import DeleteEventDialog from "./components/DeleteEventDialog.tsx";
 
 const App = () => {
@@ -79,7 +78,6 @@ const App = () => {
                 <Calendar />
             </div>
             <AddNewEvent />
-            <UpdateEvent />
             <DeleteEventDialog />
             <ToastContainer
                 theme={theme}

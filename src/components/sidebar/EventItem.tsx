@@ -5,12 +5,10 @@ import { Popover, PopoverButton, PopoverPanel } from "@headlessui/react";
 import { useAppDispatch } from "../../hook.ts";
 import { useCallback } from "react";
 import Icon from "@mdi/react";
-import { mdiCalendarEdit, mdiDelete } from "@mdi/js";
+import { mdiDelete, mdiInformation } from "@mdi/js";
 import {
     setEventTobeDeleted,
-    setEventToBeModified,
     setShowDeleteOptionDialog,
-    setShowUpdateEventDialog,
 } from "../../reducers/uiReducer.ts";
 
 const EventItem = ({ event }: { event: EventFromServer }) => {
@@ -19,11 +17,6 @@ const EventItem = ({ event }: { event: EventFromServer }) => {
     const handleDelete = useCallback(() => {
         dispatch(setShowDeleteOptionDialog(true));
         dispatch(setEventTobeDeleted(event));
-    }, [dispatch, event]);
-
-    const handleUpdate = useCallback(() => {
-        dispatch(setEventToBeModified(event));
-        dispatch(setShowUpdateEventDialog(true));
     }, [dispatch, event]);
 
     return (
@@ -60,12 +53,11 @@ const EventItem = ({ event }: { event: EventFromServer }) => {
                         </p>
 
                         <button
-                            onClick={handleUpdate}
-                            aria-label='Chỉnh sửa sự kiện'
-                            title='Chỉnh sửa sự kiện'
+                            aria-label='Chi tiết sự kiện'
+                            title='Chi tiết sự kiện'
                             className='hover:cursor-pointer dark:hover:bg-gray-600  hover:bg-gray-100 rounded-md'>
                             <div className='flex justify-center'>
-                                <Icon path={mdiCalendarEdit} size={1} />
+                                <Icon path={mdiInformation} size={1} />
                             </div>
                         </button>
                     </div>
