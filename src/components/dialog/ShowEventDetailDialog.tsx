@@ -8,7 +8,7 @@ import { useAppDispatch, useAppSelector } from "../../hook.ts";
 import { setShowEventDetailDialog } from "../../reducers/uiReducer.ts";
 import { useCallback, useMemo } from "react";
 import type { EventFromServer } from "../../type.ts";
-import { formatDateTime } from "../../utils/misc.ts";
+import { formatDateTime } from "../../utils/miscs.ts";
 import {
     getRecurrenceOptionFromRRule,
     getReminderOptionsFromKeys,
@@ -157,6 +157,23 @@ const ShowEventDetailDialog = () => {
                                             </label>
                                             <div className='px-3 py-1 bg-gray-50 border border-gray-300 rounded dark:bg-gray-700 dark:border-gray-600'>
                                                 {recurrenceInfo.numOccurrence}
+                                            </div>
+                                        </>
+                                    )}
+
+                                {recurrenceInfo &&
+                                    (recurrenceInfo.freq.key ===
+                                        "every-month" ||
+                                        recurrenceInfo.freq.key ===
+                                            "every-year") && (
+                                        <>
+                                            <label className='text-gray-700 dark:text-gray-300'>
+                                                Lặp theo âm lịch
+                                            </label>
+                                            <div className='px-3 py-1 bg-gray-50 border border-gray-300 rounded dark:bg-gray-700 dark:border-gray-600'>
+                                                {recurrenceInfo.repeatByLunar
+                                                    ? "Có"
+                                                    : "Không"}
                                             </div>
                                         </>
                                     )}

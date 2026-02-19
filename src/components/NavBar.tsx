@@ -3,7 +3,7 @@ import Icon from "@mdi/react";
 import { mdiChevronLeft, mdiChevronRight, mdiLogout } from "@mdi/js";
 import { useAppDispatch, useAppSelector } from "../hook.ts";
 import { setCurrentSelectedSolarDate } from "../reducers/dateReducer.ts";
-import { decodeAccessToken, monthNames } from "../utils/misc.ts";
+import { decodeAccessToken, monthNames } from "../utils/miscs.ts";
 import { Popover, PopoverButton, PopoverPanel } from "@headlessui/react";
 import {
     setAccessToken,

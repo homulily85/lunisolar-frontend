@@ -6,9 +6,12 @@ import {
     DialogTitle,
 } from "@headlessui/react";
 import { useCallback, useMemo } from "react";
-import { setShowDeleteOptionDialog } from "../../reducers/uiReducer.ts";
+import {
+    setShowDeleteOptionDialog,
+    setShowEventDetailDialog,
+} from "../../reducers/uiReducer.ts";
 import { useAppDispatch, useAppSelector } from "../../hook.ts";
-import { deleteOptions } from "../../utils/misc.ts";
+import { deleteOptions } from "../../utils/miscs.ts";
 import { deleteEvent, updateAnEvent } from "../../services/eventService.ts";
 import type { EventFromServer } from "../../type.ts";
 import { toast } from "react-toastify";
@@ -17,6 +20,7 @@ import {
     excludeADateFromRrule,
     setEndDateForRrule,
 } from "../../utils/events.ts";
+import { rrulestr } from "rrule";
 
 const DeleteEventDialog = () => {
     const dispatch = useAppDispatch();
@@ -33,13 +37,18 @@ const DeleteEventDialog = () => {
     ) as EventFromServer | undefined;
 
     const recurrenceCount = useMemo(() => {
-        return eventsList.filter(
-            (e) => e.id.split("_")[0] === eventTobeDeleted?.id?.split("_")[0],
-        ).length;
-    }, [eventTobeDeleted?.id, eventsList]);
+        if (!eventTobeDeleted?.rruleString) return 1;
+
+        const occurrences = rrulestr(eventTobeDeleted.rruleString).all(
+            (_date, i) => i < 2,
+        );
+
+        return occurrences.length;
+    }, [eventTobeDeleted?.rruleString]);
 
     const closeDialog = useCallback(() => {
         dispatch(setShowDeleteOptionDialog(false));
+        dispatch(setShowEventDetailDialog(false));
     }, [dispatch]);
 
     // Normalize current date to timestamp to avoid repeated conversions
@@ -141,7 +150,7 @@ const DeleteEventDialog = () => {
         [currentTs, dispatch, eventTobeDeleted, eventsList, prepareAndUpdate],
     );
 
-    if (!eventTobeDeleted?.rruleString || recurrenceCount <= 2) {
+    if (!eventTobeDeleted?.rruleString || recurrenceCount < 2) {
         return (
             <Dialog
                 open={showDialog}

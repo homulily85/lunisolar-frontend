@@ -4,7 +4,7 @@ import { mdiPlus } from "@mdi/js";
 import { useAppDispatch, useAppSelector } from "../hook.ts";
 import { setShowAddEventDialog } from "../reducers/uiReducer.ts";
 import { LunarCalendar } from "@dqcai/vn-lunar";
-import { monthNames } from "../utils/misc.ts";
+import { monthNames } from "../utils/miscs.ts";
 import EventList from "./misc/EventList.tsx";
 
 const Sidebar = () => {

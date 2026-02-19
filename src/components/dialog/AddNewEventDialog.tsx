@@ -25,7 +25,7 @@ import Icon from "@mdi/react";
 import { toast } from "react-toastify";
 import { z } from "zod";
 import type { Option } from "../../type.ts";
-import { frequency, reminderTime, repeatLimits } from "../../utils/misc.ts";
+import { frequency, reminderTime, repeatLimits } from "../../utils/miscs.ts";
 import { addNewEvent } from "../../services/eventService.ts";
 import { addEvent } from "../../reducers/eventsReducer.ts";
 import { createRruleString } from "../../utils/events.ts";
@@ -65,6 +65,8 @@ const AddNewEventDialog = () => {
         (Option | null)[]
     >([]);
 
+    const [repeatByLunar, setRepeatByLunar] = useState(false);
+
     const showDialog = useAppSelector((state) => state.ui.showAddEventDialog);
     const dispatch = useAppDispatch();
 
@@ -82,6 +84,7 @@ const AddNewEventDialog = () => {
         setSelectedStartDate(new Date(selectedTs));
         setSelectedEndDate(new Date(selectedTs));
         setUntilDate(new Date(selectedTs));
+        setRepeatByLunar(false);
     }, [selectedTs]);
 
     const closeDialog = useCallback(() => {
@@ -205,7 +208,9 @@ const AddNewEventDialog = () => {
         if (selectedRepeat.key === "none") {
             rruleString = "";
         } else if (repeatLimit.key === "none") {
-            rruleString = createRruleString(selectedRepeat.key, startDateTime);
+            rruleString = createRruleString(selectedRepeat.key, startDateTime, {
+                repeatByLunar,
+            });
         } else if (repeatLimit.key === "untilDate") {
             if (untilDate < startDateTime) {
                 toast.error("Ngày kết thúc lặp phải sau ngày bắt đầu!");
@@ -213,6 +218,7 @@ const AddNewEventDialog = () => {
             }
             rruleString = createRruleString(selectedRepeat.key, startDateTime, {
                 untilDate,
+                repeatByLunar,
             });
         } else if (repeatLimit.key === "numOccurrence") {
             const num =
@@ -226,6 +232,7 @@ const AddNewEventDialog = () => {
             }
             rruleString = createRruleString(selectedRepeat.key, startDateTime, {
                 numOccurrence: num,
+                repeatByLunar,
             });
         }
 
@@ -258,7 +265,6 @@ const AddNewEventDialog = () => {
                     rruleString,
                 }),
             );
-
             closeDialog();
         } catch (e) {
             toast.error("Có lỗi xảy ra khi tạo sự kiện mới");
@@ -470,6 +476,24 @@ const AddNewEventDialog = () => {
                                                 onBlur={handleBlur}
                                                 className='w-full border border-gray-300 rounded px-3 py-1.5 focus:outline-none focus:border-orange-300 dark:border-gray-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none'
                                             />
+                                        </>
+                                    )}
+
+                                {selectedRepeat &&
+                                    (selectedRepeat.key === "every-month" ||
+                                        selectedRepeat.key ===
+                                            "every-year") && (
+                                        <>
+                                            <label className='self-center'>
+                                                Lặp theo âm lịch
+                                            </label>
+
+                                            <Switch
+                                                checked={repeatByLunar}
+                                                onChange={setRepeatByLunar}
+                                                className='group inline-flex justify-self-end h-6 w-11 items-center rounded-full bg-gray-300 dark:bg-gray-600 transition data-checked:bg-orange-400 mt-2'>
+                                                <span className='size-4 translate-x-1 rounded-full bg-white transition group-data-checked:translate-x-6' />
+                                            </Switch>
                                         </>
                                     )}
                             </div>

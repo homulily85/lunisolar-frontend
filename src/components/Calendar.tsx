@@ -14,7 +14,7 @@ import { getEvents } from "../services/eventService.ts";
 import { toast } from "react-toastify";
 import { setEvents } from "../reducers/eventsReducer.ts";
 
-import { isSameDate } from "../utils/misc.ts";
+import { isSameDate } from "../utils/miscs.ts";
 import { expandEvent } from "../utils/events.ts";
 
 const WEEK_DAYS = [
