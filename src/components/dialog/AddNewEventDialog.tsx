@@ -25,7 +25,7 @@ import Icon from "@mdi/react";
 import { toast } from "react-toastify";
 import { z } from "zod";
 import type { Option } from "../../type.ts";
-import { frequency, reminderTime, repeatLimits } from "../../utils/misc.ts";
+import { frequency, reminderTime, repeatLimits } from "../../utils/miscs.ts";
 import { addNewEvent } from "../../services/eventService.ts";
 import { addEvent } from "../../reducers/eventsReducer.ts";
 import { createRruleString } from "../../utils/events.ts";

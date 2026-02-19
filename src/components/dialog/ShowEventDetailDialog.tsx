@@ -8,7 +8,7 @@ import { useAppDispatch, useAppSelector } from "../../hook.ts";
 import { setShowEventDetailDialog } from "../../reducers/uiReducer.ts";
 import { useCallback, useMemo } from "react";
 import type { EventFromServer } from "../../type.ts";
-import { formatDateTime } from "../../utils/misc.ts";
+import { formatDateTime } from "../../utils/miscs.ts";
 import {
     getRecurrenceOptionFromRRule,
     getReminderOptionsFromKeys,

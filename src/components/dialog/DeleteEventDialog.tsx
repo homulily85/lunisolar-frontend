@@ -8,7 +8,7 @@ import {
 import { useCallback, useMemo } from "react";
 import { setShowDeleteOptionDialog } from "../../reducers/uiReducer.ts";
 import { useAppDispatch, useAppSelector } from "../../hook.ts";
-import { deleteOptions } from "../../utils/misc.ts";
+import { deleteOptions } from "../../utils/miscs.ts";
 import { deleteEvent, updateAnEvent } from "../../services/eventService.ts";
 import type { EventFromServer } from "../../type.ts";
 import { toast } from "react-toastify";

@@ -1,6 +1,6 @@
 import { type EventFromServer } from "../../type.ts";
 
-import { formatDateTime } from "../../utils/misc.ts";
+import { formatDateTime } from "../../utils/miscs.ts";
 import { Popover, PopoverButton, PopoverPanel } from "@headlessui/react";
 import { useAppDispatch } from "../../hook.ts";
 import { useCallback } from "react";

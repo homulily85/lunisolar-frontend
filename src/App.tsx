@@ -14,7 +14,7 @@ import {
 import { useAppDispatch } from "./hook";
 import { CombinedGraphQLErrors } from "@apollo/client";
 import { getAccessToken } from "./services/authenticationService.ts";
-import { decodeAccessToken } from "./utils/misc.ts";
+import { decodeAccessToken } from "./utils/miscs.ts";
 import DeleteEventDialog from "./components/dialog/DeleteEventDialog.tsx";
 import ShowEventDetailDialog from "./components/dialog/ShowEventDetailDialog.tsx";
 

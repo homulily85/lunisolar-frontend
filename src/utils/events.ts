@@ -1,6 +1,6 @@
 import { type EventFromServer, type Option } from "../type.ts";
 import { datetime, RRule, RRuleSet, rrulestr } from "rrule";
-import { frequency, reminderTime, repeatLimits } from "./misc.ts";
+import { frequency, reminderTime, repeatLimits } from "./miscs.ts";
 
 const FREQUENCY_OPTIONS: Record<string, unknown> = {
     none: undefined,
@@ -146,7 +146,7 @@ export const excludeADateFromRrule = (rruleString: string, date: Date) => {
 };
 
 export const setEndDateForRrule = (rruleString: string, date: Date) => {
-    const rule = rrulestr(rruleString, {
+    const parsed = rrulestr(rruleString, {
         cache: true,
     });
 
@@ -159,10 +159,26 @@ export const setEndDateForRrule = (rruleString: string, date: Date) => {
         date.getSeconds(),
     );
 
-    const ruleSet = new RRuleSet();
-    ruleSet.rrule(new RRule({ ...rule.options, until: floatingDate }));
+    const newRuleSet = new RRuleSet();
 
-    return ruleSet.toString();
+    if (parsed instanceof RRuleSet) {
+        parsed.rrules().forEach((rule) => {
+            newRuleSet.rrule(
+                new RRule({ ...rule.options, until: floatingDate }),
+            );
+        });
+
+        parsed.exdates().forEach((exdate) => {
+            newRuleSet.exdate(exdate);
+        });
+
+        parsed.rdates().forEach((rdate) => newRuleSet.rdate(rdate));
+        parsed.exrules().forEach((exrule) => newRuleSet.exrule(exrule));
+    } else {
+        newRuleSet.rrule(new RRule({ ...parsed.options, until: floatingDate }));
+    }
+
+    return newRuleSet.toString();
 };
 
 export const getReminderOptionsFromKeys = (
@@ -188,7 +204,19 @@ export const getRecurrenceOptionFromRRule = (
 
     if (rruleString) {
         try {
-            const options = RRule.parseString(rruleString);
+            const parsed = rrulestr(rruleString);
+
+            let options;
+            if (parsed instanceof RRuleSet) {
+                const rrules = parsed.rrules();
+                if (rrules.length === 0) {
+                    throw new Error("No RRULE found in RRuleSet");
+                }
+                options = rrules[0].options;
+            } else {
+                options = parsed.options;
+            }
+
             const freq = options.freq;
             const interval = options.interval || 1;
 
